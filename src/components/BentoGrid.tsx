@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { LiveWatchCard } from './LiveWatchCard';
 import { PROJECTS, TECH_MARQUEE_ITEMS } from '../data/portfolioData';
-import { ModalView, ProjectItem } from '../types/portfolio';
+import { ProjectItem } from '../types/portfolio';
 
 interface BentoGridProps {
   onOpenAbout: () => void;
@@ -14,8 +14,6 @@ export const BentoGrid: React.FC<BentoGridProps> = ({
   onOpenProjects,
   onSelectProject,
 }) => {
-  const [activeNowInfo, setActiveNowInfo] = useState(false);
-
   return (
     <section id="bento-section" className="max-w-6xl mx-auto px-6 py-12 space-y-6">
       {/* Top 3-Card Grid */}
@@ -76,11 +74,7 @@ export const BentoGrid: React.FC<BentoGridProps> = ({
             onClick={onOpenAbout}
             className="rounded-2xl border border-white/[0.08] bg-[#0d131f]/90 p-6 flex flex-col justify-between hover:border-white/20 transition-all duration-300 group shadow-lg cursor-pointer min-h-[170px]"
           >
-            <div className="flex items-start justify-between">
-              {/* Dotted Avatar Photo Circle */}
-              <div className="w-12 h-12 rounded-full border border-dashed border-white/30 flex items-center justify-center text-[10px] font-mono text-slate-400 group-hover:border-red-500 group-hover:text-red-400 transition-all">
-                photo
-              </div>
+            <div className="flex items-start justify-end">
               <span className="font-mono text-xs text-slate-500 group-hover:text-slate-300 transition-colors">
                 Bio & ID
               </span>
@@ -105,16 +99,10 @@ export const BentoGrid: React.FC<BentoGridProps> = ({
       </div>
 
       {/* Card 4: Now Card */}
-      <div
-        onClick={() => setActiveNowInfo(!activeNowInfo)}
-        className="rounded-2xl border border-white/[0.08] bg-[#0d131f]/90 p-6 sm:p-8 hover:border-white/20 transition-all duration-300 shadow-lg cursor-pointer group"
-      >
+      <div className="rounded-2xl border border-white/[0.08] bg-[#0d131f]/90 p-6 sm:p-8 hover:border-white/20 transition-all duration-300 shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <span className="font-mono text-xs text-slate-400 tracking-wide uppercase">
             Now
-          </span>
-          <span className="text-[11px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">
-            {activeNowInfo ? 'Click to collapse' : 'Click to read sprint focus'}
           </span>
         </div>
 
@@ -122,18 +110,6 @@ export const BentoGrid: React.FC<BentoGridProps> = ({
           <span>Building this portfolio site.</span>
           <span className="text-red-500 font-bold ml-1 animate-cursor-blink">|</span>
         </div>
-
-        {activeNowInfo && (
-          <div className="mt-4 pt-4 border-t border-white/[0.06] text-sm text-slate-300 space-y-2 animate-fadeIn">
-            <p>
-              Current Sprint: Refining the 3D holographic tilt card, polishing the Lore storytelling timeline, and preparing public open-source repos for Fikro and TAWT.
-            </p>
-            <div className="flex items-center gap-2 text-xs font-mono text-slate-400 pt-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>Status: Active coding session in Dhaka</span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Card 5: Infinite Marquee Tech Ticker */}

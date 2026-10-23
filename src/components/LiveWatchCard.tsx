@@ -40,12 +40,7 @@ export const LiveWatchCard: React.FC = () => {
           <span className="font-mono text-xs text-slate-400 tracking-wide">
             Time on my watch
           </span>
-          <span className="text-xs font-mono text-slate-500 flex items-center gap-1.5">
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                isDayTime ? 'bg-amber-400' : 'bg-indigo-400'
-              } animate-pulse`}
-            />
+          <span className="text-xs font-mono text-slate-500">
             {isDayTime ? 'Day' : 'Night'}
           </span>
         </div>

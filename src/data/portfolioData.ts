@@ -22,28 +22,35 @@ export const PERSONAL_INFO = {
 
 export const PROJECTS: ProjectItem[] = [
   {
-    id: 'fikro',
-    name: 'Fikro',
-    tagline: 'Idea capture and retrieval',
-    category: 'AI Knowledge Architecture',
-    year: '2025 - Present',
-    status: 'Active Development',
+    id: 'soundmesh',
+    name: 'SoundMesh',
+    tagline: 'Turns nearby phones into one synchronized speaker',
+    category: 'Local-First Synchronized Audio',
+    year: '2026',
+    status: 'Shipped',
     description:
-      'A low-friction thought and voice capture system that uses autonomous AI agents to categorize, link, and semantically query spontaneous ideas before they evaporate.',
+      'SoundMesh is a Flutter-first, local-first mobile app that turns nearby phones into one synchronized speaker. Built for the Shipathon 2026 hackathon in collaboration with [Faraz](https://farazkh.dev/). Flutter handles the UI, navigation, high-level state, and orchestration, while Native Android drives timing-critical audio, networking, and scheduling via a typed Pigeon bridge. Subsystems are governed by strict Core, Room, Device, Audio, Playback, and Sync API contracts.',
     architecture: [
-      'Local-first SQLite storage with vector embeddings via pgvector / sqlite-vec',
-      'Multi-agent background pipeline for automatic tag extraction and knowledge graphs',
-      'Cross-platform Flutter companion for instant home screen lockup capture'
+      'Flutter shell orchestrating UI, navigation, and high-level room state',
+      'Native Android engine managing timing-critical audio playback, networking, and scheduling',
+      'Typed Pigeon bridge with formal Core, Room, Device, Audio, Playback, and Sync contracts'
     ],
     features: [
-      'Instant voice memo transcription and context categorization',
-      'Bidirectional memory synthesis across weeks of unorganized notes',
-      'Semantic natural-language query engine ("What was my idea about study group scheduling?")',
-      'Zero-latency offline-first synchronization'
+      'Turns multiple nearby phones into a unified synchronized speaker cluster',
+      '100% local-first WiFi transmission with no external internet or cloud server needed',
+      'Sub-millisecond sync time clock and low-latency audio packet processing',
+      'Typed subsystem contracts enforcing modular room and playback architecture'
     ],
-    stack: ['Python', 'FastAPI', 'Flutter', 'Dart', 'AI Agents', 'ChromaDB'],
-    githubUrl: 'https://github.com/Mahinite/fikro',
-    liveUrl: 'https://fikro.app'
+    stack: [
+      'Flutter',
+      'Dart',
+      'Native Android',
+      'Core Engine',
+      'Audio Packet Processing',
+      'WiFi Transmission',
+      'Sync Time Clock'
+    ],
+    githubUrl: 'https://github.com/farazkayan/SoundMesh'
   },
   {
     id: 'tawt',
@@ -67,31 +74,30 @@ export const PROJECTS: ProjectItem[] = [
     ],
     stack: ['React', 'TypeScript', 'Tailwind CSS', 'Web Audio API'],
     githubUrl: 'https://github.com/Mahinite/tawt',
-    liveUrl: 'https://tawt-timer.web.app'
+    liveUrl: 'https://tawt.pages.dev'
   },
   {
     id: 'shelf',
     name: 'Shelf',
-    tagline: 'Note sharing for classmates',
-    category: 'Peer Collaboration Platform',
-    year: '2024 - 2025',
+    tagline: 'Room-based note sharing for classmates',
+    category: 'Collaborative Study Platform',
+    year: '2026',
     status: 'Shipped',
     description:
-      'A high-speed collaborative notes and resources repository built for peers and classmates in Dhaka. Allows instant sharing of handwritten annotations, lecture slides, and AI-summarized past paper solutions.',
+      'A room-based note upload and access place for classmates or study mates. Built with a Backblaze B2 server-based storage infrastructure rather than P2P, providing fast and reliable note sharing, organized study rooms, and frictionless student access.',
     architecture: [
-      'React frontend with instant full-text client indexing',
-      'Document processing pipeline converting camera snaps into legible clean PDFs',
-      'Anonymous voting and peer verification system for textbook solutions'
+      'Flutter & Dart client application with reactive room-based navigation',
+      'Backblaze B2 server-based cloud storage for dependable document and note hosting',
+      'Supabase backend with PostgreSQL database and Google Authentication'
     ],
     features: [
-      'Course-by-course syllabi organization matching national curricula',
-      'Instant PDF search with optical character recognition highlights',
-      'Classmate bookmarking and batch offline download support',
-      'Clean markdown note rendering with KaTeX formula support'
+      'Room-based note upload and access for classmates and study mates',
+      'B2 server-based cloud storage infrastructure',
+      'Google Authentication integration for student accounts',
+      'Dedicated room workspaces organized by syllabus and subject'
     ],
-    stack: ['React', 'TypeScript', 'Tailwind CSS', 'Python', 'Firebase'],
-    githubUrl: 'https://github.com/Mahinite/shelf',
-    liveUrl: 'https://shelf-notes.vercel.app'
+    stack: ['Dart', 'Flutter', 'Supabase', 'Google Auth', 'PostgreSQL', 'Backblaze B2'],
+    githubUrl: 'https://github.com/Mahinite/shelf'
   }
 ];
 
@@ -142,10 +148,10 @@ export const LORE_CHAPTERS: LoreItem[] = [
     id: 'ai-agents',
     badge: 'build',
     title: 'Building with AI agents',
-    subtitle: 'Shelf, TAWT, Fikro.',
+    subtitle: 'Shelf, TAWT, SoundMesh.',
     date: 'The Modern Chapter · 2024 - Present',
     story:
-      'What began as simple prompt tinkering evolved into architecting full-blown agentic workflows. When building Shelf, TAWT, and Fikro, I realized that modern AI tooling allows a single determined high-school/college builder in Dhaka to construct systems that previously required entire software engineering departments. The future belongs to those who combine genuine empathy for user problems with autonomous execution.',
+      'What began as simple prompt tinkering evolved into architecting full-blown agentic workflows. When building Shelf, TAWT, and SoundMesh, I realized that modern AI tooling allows a single determined builder in Dhaka to construct systems that previously required entire software engineering departments. The future belongs to those who combine genuine empathy for user problems with autonomous execution.',
     highlights: [
       'Moving from simple chat interfaces to autonomous tool-calling pipelines',
       'Building custom tools to solve friction points in my own daily student routine',
@@ -170,18 +176,19 @@ export const ASCII_PORTRAIT = `              .::::::.
       .:-=+*#%@@@@@@@@%#*+=-:.     `;
 
 export const TECH_MARQUEE_ITEMS = [
-  'AI agents',
-  'Python',
-  'React',
-  'Dart',
   'Flutter',
+  'Dart',
+  'Native Android',
+  'AI agents',
+  'React',
+  'Audio Packet Processing',
   'DaVinci Resolve',
   'Product Design',
   'TypeScript',
   'Tailwind CSS',
-  'FastAPI',
+  'Sync Time Clock',
+  'WiFi Transmission',
   'Autonomous Agents',
-  'Vector Search',
   'System Architecture',
   'Motion Design'
 ];

@@ -8,6 +8,43 @@ interface ProjectDetailModalProps {
   onClose: () => void;
 }
 
+const renderFormattedDescription = (text: string) => {
+  const parts: (string | React.ReactNode)[] = [];
+  const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    if (match[1] && match[2]) {
+      parts.push(
+        <a
+          key={match.index}
+          href={match[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold text-white underline hover:text-red-400 transition-colors"
+        >
+          {match[1]}
+        </a>
+      );
+    } else if (match[3]) {
+      parts.push(
+        <strong key={match.index} className="font-bold text-white">
+          {match[3]}
+        </strong>
+      );
+    }
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+  return parts.length > 0 ? parts : text;
+};
+
 export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   isOpen,
   initialProject,
@@ -42,17 +79,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-[#080c14]/95 backdrop-blur-2xl animate-fadeIn">
       {/* Top Bar */}
-      <div className="sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-red-400 font-bold tracking-widest uppercase">
-            PROJECT CATALOGUE
-          </span>
-          <span className="text-slate-600 font-mono">/</span>
-          <span className="font-mono text-xs text-slate-300">
-            {PROJECTS.length} Built Products
-          </span>
-        </div>
-
+      <div className="sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8">
         <button
           onClick={onClose}
           className="w-10 h-10 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center transition-all cursor-pointer group"
@@ -89,7 +116,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                   {activeProject.name}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono border border-emerald-500/30 text-emerald-400 bg-emerald-950/20">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono border border-sky-500/30 text-sky-400 bg-sky-950/30">
                   {activeProject.status}
                 </span>
               </div>
@@ -110,7 +137,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 className="px-4 py-2 rounded-lg border border-white/15 bg-white/[0.03] text-xs font-mono text-white hover:bg-white/10 transition-colors flex items-center gap-1.5"
               >
                 <span>GitHub</span>
-                <span className="text-[10px] text-slate-400">↗</span>
               </a>
               {activeProject.liveUrl && (
                 <a
@@ -119,8 +145,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                   rel="noopener noreferrer"
                   className="px-4 py-2 rounded-lg border border-red-500/40 bg-red-500/10 text-xs font-mono text-red-300 hover:bg-red-500/20 transition-colors flex items-center gap-1.5"
                 >
-                  <span>Live App</span>
-                  <span className="text-[10px]">↗</span>
+                  <span>Web App</span>
                 </a>
               )}
             </div>
@@ -128,45 +153,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
           {/* Description */}
           <div className="text-slate-300 text-base leading-relaxed">
-            <p>{activeProject.description}</p>
-          </div>
-
-          {/* Architecture & Engineering Approach */}
-          <div className="space-y-3">
-            <h3 className="font-mono text-xs text-red-400 font-bold uppercase tracking-wider">
-              Engineering Architecture
-            </h3>
-            <div className="grid grid-cols-1 gap-2.5">
-              {activeProject.architecture.map((arch, idx) => (
-                <div
-                  key={idx}
-                  className="p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.015] flex items-start gap-3"
-                >
-                  <span className="font-mono text-xs text-slate-500 mt-0.5">
-                    0{idx + 1}.
-                  </span>
-                  <span className="text-sm text-slate-200">{arch}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="space-y-3">
-            <h3 className="font-mono text-xs text-slate-400 font-bold uppercase tracking-wider">
-              Key Capabilities
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {activeProject.features.map((feat, idx) => (
-                <div
-                  key={idx}
-                  className="p-3 rounded-lg border border-white/[0.04] bg-white/[0.01] text-xs text-slate-300 flex items-start gap-2"
-                >
-                  <span className="text-emerald-400 font-bold">✓</span>
-                  <span>{feat}</span>
-                </div>
-              ))}
-            </div>
+            <p>{renderFormattedDescription(activeProject.description)}</p>
           </div>
 
           {/* Tech Stack Pills */}

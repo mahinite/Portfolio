@@ -44,10 +44,6 @@ export const AboutModal: React.FC<AboutModalProps> = ({
       </div>
 
       <div className="max-w-3xl mx-auto px-6 pb-20 pt-2 flex flex-col items-center text-center">
-        {/* Photo avatar dotted ring */}
-        <div className="w-20 h-20 rounded-full border-2 border-dashed border-white/30 flex items-center justify-center font-mono text-xs text-slate-300 bg-white/[0.02] mb-8 shadow-inner">
-          [ photo ]
-        </div>
 
         {/* Full Name */}
         <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
@@ -69,7 +65,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
 
         {/* Tech Skill Pills */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 max-w-xl">
-          {['AI agents', 'Python', 'React', 'Dart / Flutter', 'DaVinci Resolve'].map(
+          {['AI agents', 'React', 'Dart / Flutter', 'DaVinci Resolve'].map(
             (skill) => (
               <span
                 key={skill}
@@ -99,10 +95,6 @@ export const AboutModal: React.FC<AboutModalProps> = ({
               →
             </span>
           </div>
-
-          <p className="mt-2 text-xs sm:text-sm font-mono text-sky-400 underline underline-offset-4 decoration-sky-600/60 group-hover:text-sky-300 transition-colors">
-            A few chapters. Opens inside this page.
-          </p>
         </div>
       </div>
     </div>

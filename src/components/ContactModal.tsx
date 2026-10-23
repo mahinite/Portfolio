@@ -123,8 +123,8 @@ export const ContactModal: React.FC<ContactModalProps> = ({
 
         {/* Message Form */}
         {isSuccess ? (
-          <div className="p-8 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 text-center space-y-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center text-xl font-bold">
+          <div className="p-8 rounded-2xl border border-sky-500/30 bg-sky-950/20 text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-sky-500/20 text-sky-400 mx-auto flex items-center justify-center text-xl font-bold">
               ✓
             </div>
             <h3 className="text-xl font-bold text-white">Message dispatched</h3>

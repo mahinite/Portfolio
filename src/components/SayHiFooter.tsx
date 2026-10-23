@@ -30,7 +30,7 @@ export const SayHiFooter: React.FC<SayHiFooterProps> = ({ onOpenContact, onShowT
   return (
     <footer id="contact-section" className="max-w-6xl mx-auto px-6 pt-16 pb-12 select-none">
       {/* Massive 3D Typographic Headline */}
-      <div className="py-12 cursor-pointer group" onClick={onOpenContact}>
+      <div className="inline-block cursor-pointer group my-8" onClick={onOpenContact}>
         <h2
           className="text-7xl sm:text-9xl font-black tracking-tight text-white transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
           style={{
@@ -39,9 +39,6 @@ export const SayHiFooter: React.FC<SayHiFooterProps> = ({ onOpenContact, onShowT
         >
           Say hi.
         </h2>
-        <p className="mt-3 text-xs font-mono text-slate-500 group-hover:text-slate-400 transition-colors">
-          Click anywhere on "Say hi." to open the quick message modal →
-        </p>
       </div>
 
       {/* Meta Footer Line */}
@@ -56,7 +53,7 @@ export const SayHiFooter: React.FC<SayHiFooterProps> = ({ onOpenContact, onShowT
             <span className="text-slate-200 underline decoration-slate-600 underline-offset-4">
               {PERSONAL_INFO.email}
             </span>
-            {copied && <span className="text-emerald-400 text-[10px]">✓ copied!</span>}
+            {copied && <span className="text-sky-400 text-[10px]">✓ copied!</span>}
           </button>
 
           <span className="text-slate-600">·</span>
@@ -68,7 +65,6 @@ export const SayHiFooter: React.FC<SayHiFooterProps> = ({ onOpenContact, onShowT
             className="hover:text-white transition-colors flex items-center gap-1 cursor-pointer bg-white/[0.02] hover:bg-white/[0.06] px-2.5 py-1 rounded border border-white/5"
           >
             <span>github.com/{PERSONAL_INFO.githubHandle}</span>
-            <span className="text-[10px] text-slate-500">↗</span>
           </a>
         </div>
 

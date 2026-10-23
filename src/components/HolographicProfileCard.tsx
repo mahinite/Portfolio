@@ -57,14 +57,14 @@ export const HolographicProfileCard: React.FC = () => {
       >
         {/* ================= FRONT SIDE ================= */}
         <div
-          className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#121926] via-[#0d131f] to-[#070a10] p-6 flex flex-col justify-between overflow-hidden backface-hidden shadow-inner"
+          className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#121926] via-[#0d131f] to-[#070a10] overflow-hidden backface-hidden shadow-inner flex flex-col justify-end"
           style={{
             backfaceVisibility: 'hidden',
           }}
         >
           {/* Holographic Iridescent Foil Sheen */}
           <div
-            className="absolute inset-0 pointer-events-none transition-opacity duration-300"
+            className="absolute inset-0 pointer-events-none transition-opacity duration-300 z-10"
             style={{
               opacity: isHovered ? 0.75 : 0.35,
               background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255, 255, 255, 0.22) 0%, rgba(244, 63, 94, 0.15) 25%, rgba(59, 130, 246, 0.15) 50%, rgba(245, 158, 11, 0.12) 75%, transparent 100%)`,
@@ -74,7 +74,7 @@ export const HolographicProfileCard: React.FC = () => {
 
           {/* Diagonal rainbow streak simulation */}
           <div
-            className="absolute -inset-full pointer-events-none opacity-20 transform -rotate-45 transition-all duration-700"
+            className="absolute -inset-full pointer-events-none opacity-20 transform -rotate-45 transition-all duration-700 z-10"
             style={{
               background:
                 'linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.4), rgba(59, 130, 246, 0.4), rgba(16, 185, 129, 0.4), transparent)',
@@ -82,52 +82,26 @@ export const HolographicProfileCard: React.FC = () => {
             }}
           />
 
-          {/* Top Row: Dotted Photo Badge & NFC Chip */}
-          <div className="relative z-10 flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center font-mono text-[11px] text-slate-300 bg-white/[0.04]">
-                [ photo ]
-              </div>
-              <div>
-                <p className="font-mono text-[10px] text-slate-400 uppercase tracking-widest">
-                  ID CARD
-                </p>
-                <p className="font-mono text-xs text-white font-semibold">
-                  #MAHIN-2026
-                </p>
-              </div>
-            </div>
-
-            {/* Simulated Smart Chip */}
-            <div className="w-9 h-7 rounded border border-amber-400/60 bg-gradient-to-br from-amber-300/30 to-amber-600/30 flex items-center justify-center p-1 shadow-sm">
-              <div className="w-full h-full border border-amber-400/40 grid grid-cols-2 gap-0.5 opacity-80">
-                <div className="border-r border-amber-400/40" />
-                <div />
-              </div>
-            </div>
+          {/* Full-span Picture */}
+          <div className="absolute inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
+            <img
+              src="/assets/aistudio/Arifeen_Siddiquei_Mahin_4c622d58.svg"
+              alt={PERSONAL_INFO.name}
+              className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+            />
           </div>
 
-          {/* Center Identity */}
-          <div className="relative z-10 space-y-2 my-auto">
-            <span className="font-mono text-[10px] tracking-widest text-red-400 uppercase">
-              Developer Specimen
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-              {PERSONAL_INFO.name}
-            </h3>
-            <p className="text-xs text-slate-300 font-mono">
-              AI Engineer · Product Builder · Student
-            </p>
-            <div className="pt-2 flex items-center gap-2 text-[11px] font-mono text-slate-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>Dhaka, Bangladesh · 23.81° N</span>
-            </div>
-          </div>
+          {/* Accessible Heading for Screen Readers */}
+          <h3 className="sr-only">{PERSONAL_INFO.name}</h3>
 
-          {/* Bottom Card Strip */}
-          <div className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
-            <span>Profile card (holographic, as shipped)</span>
-            <span className="text-slate-300 group-hover:text-red-400 transition-colors flex items-center gap-1">
+          {/* Bottom Card Strip (Minimal, floating seamlessly without any background shelf lines) */}
+          <div className="relative z-20 w-full pb-3.5 px-5 flex items-center justify-end text-[11px] font-mono text-slate-300">
+            <span
+              className="text-slate-200 group-hover:text-red-400 transition-colors flex items-center gap-1 font-semibold"
+              style={{
+                textShadow: '0 2px 8px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.95)',
+              }}
+            >
               <span>Flip</span> ↺
             </span>
           </div>
@@ -135,7 +109,7 @@ export const HolographicProfileCard: React.FC = () => {
 
         {/* ================= BACK SIDE ================= */}
         <div
-          className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#0c1017] via-[#101726] to-[#070a10] p-6 flex flex-col justify-between overflow-hidden shadow-2xl"
+          className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#0c1017] via-[#101726] to-[#070a10] p-6 flex flex-col justify-end overflow-hidden shadow-2xl"
           style={{
             transform: 'rotateY(180deg)',
             backfaceVisibility: 'hidden',
@@ -150,66 +124,10 @@ export const HolographicProfileCard: React.FC = () => {
             }}
           />
 
-          {/* Back Header */}
-          <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-3">
-            <span className="font-mono text-[11px] text-slate-400 uppercase tracking-widest">
-              SYSTEM CREDENTIALS
-            </span>
-            <span className="font-mono text-[11px] text-emerald-400 font-bold">
-              VERIFIED
-            </span>
-          </div>
-
-          {/* Back Stats */}
-          <div className="relative z-10 space-y-4 my-auto">
-            <div className="space-y-1">
-              <span className="font-mono text-[10px] text-slate-400 uppercase">
-                Shipped Products
-              </span>
-              <p className="font-mono text-sm text-white font-semibold">
-                Fikro · TAWT · Shelf
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <span className="font-mono text-[10px] text-slate-400 uppercase">
-                Core Stack
-              </span>
-              <p className="font-mono text-xs text-slate-300">
-                Python, React, Dart, Flutter, PyTorch, FastMCP
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <span className="font-mono text-[10px] text-slate-400 uppercase">
-                Focus Areas
-              </span>
-              <p className="font-mono text-xs text-slate-300">
-                Autonomous AI agents, student utilities, context-aware UX
-              </p>
-            </div>
-
-            {/* Mini Barcode / Security Strip */}
-            <div className="pt-2">
-              <div className="h-6 w-full bg-white/10 flex items-center justify-between px-2 gap-1 rounded overflow-hidden">
-                {Array.from({ length: 28 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-full bg-white/60"
-                    style={{ width: (i % 3 === 0 ? 3 : i % 2 === 0 ? 1.5 : 1) + 'px' }}
-                  />
-                ))}
-              </div>
-              <p className="font-mono text-[9px] text-slate-500 text-center mt-1">
-                AUTH-SHA256: 9b2e9e66768ce4d1
-              </p>
-            </div>
-          </div>
-
           {/* Back Footer */}
           <div className="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between font-mono text-[11px] text-slate-400">
             <span>github.com/{PERSONAL_INFO.githubHandle}</span>
-            <span className="text-slate-300 group-hover:text-red-400 transition-colors flex items-center gap-1">
+            <span className="text-slate-300 group-hover:text-red-400 transition-colors flex items-center gap-1 font-semibold">
               <span>Flip</span> ↺
             </span>
           </div>
