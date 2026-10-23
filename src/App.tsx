@@ -85,71 +85,70 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0b0f17] text-slate-100 selection:bg-red-500/30 selection:text-white font-sans relative">
-      {/* Background ambient lighting */}
-      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-red-600/[0.04] blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-blue-600/[0.03] blur-[160px] pointer-events-none -z-10" />
-
+    <div className="min-h-screen text-slate-100 selection:bg-red-500/30 selection:text-white font-sans relative">
       {/* Full-Screen MicroSlats Interactive Background from React Bits */}
-      <div className="fixed inset-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 w-screen h-screen z-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <MicroSlats
           preset="swell"
-          color="#0c141d"
-          glintColor="#d94551"
+          color="#182536"
+          glintColor="#f87171"
           backgroundColor="#080c14"
           slatWidth={12}
           slatHeight={22}
           gap={3}
           roundness={0.75}
           interactive
-          cursorStrength={1}
-          cursorSize={40}
-          swirl={0.15}
-          trail={1.4}
-          lean={0}
+          cursorStrength={1.5}
+          cursorSize={45}
+          swirl={0.2}
+          trail={1.5}
+          lean={0.2}
           intro
           scale={1.5}
-          speed={0.6}
+          speed={0.65}
           direction={250}
           chop={0.55}
-          stretch={0}
-          glint={0.7}
-          contrast={1.25}
+          stretch={0.15}
+          glint={1.1}
+          contrast={1.4}
           perspective={0.55}
-          fog={0.55}
+          fog={0.5}
           introDuration={1.5}
           paused={false}
         />
       </div>
 
-      {/* Top 3-Zone Navigation */}
-      <Navigation
-        activeSection={activeSection}
-        onNavigate={(sec) => setActiveSection(sec)}
-        onOpenModal={(modal) => setActiveModal(modal)}
-      />
-
-      {/* Main Page Layout (lives on top of MicroSlats background) */}
-      <main className="relative z-10">
-        {/* Screen 1: Hero Section */}
-        <HeroSection
-          onOpenAbout={handleOpenAbout}
-          onScrollDown={handleScrollDown}
+      {/* Foreground Content Layer */}
+      <div className="relative z-10 min-h-screen">
+        {/* Top 3-Zone Navigation */}
+        <Navigation
+          activeSection={activeSection}
+          onNavigate={(sec) => setActiveSection(sec)}
+          onOpenModal={(modal) => setActiveModal(modal)}
         />
 
-        {/* Screen 2: Bento Grid (Projects, About me, Watch, Now, Marquee) */}
-        <BentoGrid
-          onOpenAbout={handleOpenAbout}
-          onOpenProjects={handleOpenProjects}
-          onSelectProject={handleSelectProject}
-        />
+        {/* Main Page Layout (lives on top of MicroSlats background) */}
+        <main>
+          {/* Screen 1: Hero Section */}
+          <HeroSection
+            onOpenAbout={handleOpenAbout}
+            onScrollDown={handleScrollDown}
+          />
 
-        {/* Screen 3: Say hi 3D Footer */}
-        <SayHiFooter
-          onOpenContact={handleOpenContact}
-          onShowToast={showToast}
-        />
-      </main>
+          {/* Screen 2: Bento Grid (Projects, About me, Watch, Now, Marquee) */}
+          <BentoGrid
+            onOpenAbout={handleOpenAbout}
+            onOpenProjects={handleOpenProjects}
+            onSelectProject={handleSelectProject}
+          />
+
+          {/* Screen 3: Say hi 3D Footer */}
+          <SayHiFooter
+            onOpenContact={handleOpenContact}
+            onShowToast={showToast}
+          />
+        </main>
+      </div>
 
       {/* Interactive Modals */}
       <AboutModal

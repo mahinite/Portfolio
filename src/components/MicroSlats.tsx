@@ -731,8 +731,8 @@ export const MicroSlats = ({
     };
 
     const resize = () => {
-      width = Math.max(1, container.clientWidth);
-      height = Math.max(1, container.clientHeight);
+      width = Math.max(1, container.clientWidth || window.innerWidth || 1200);
+      height = Math.max(1, container.clientHeight || window.innerHeight || 800);
       renderer.dpr = Math.min(
         window.devicePixelRatio || 1,
         2,
@@ -749,8 +749,8 @@ export const MicroSlats = ({
       const gapSize = clamp(s.gap, 0, 64);
       const pitchX = slatW + gapSize;
       const pitchY = slatH + gapSize;
-      const cols = Math.min(2048, Math.ceil((width + gapSize) / pitchX) + 1);
-      const rows = Math.min(2048, Math.ceil((height + gapSize) / pitchY) + 1);
+      const cols = Math.max(1, Math.min(2048, Math.ceil((width + gapSize) / pitchX) + 1));
+      const rows = Math.max(1, Math.min(2048, Math.ceil((height + gapSize) / pitchY) + 1));
       const originX = (width - (cols * pitchX - gapSize)) / 2;
       const originY = (height - (rows * pitchY - gapSize)) / 2;
       if (fieldTarget.width !== cols || fieldTarget.height !== rows) {
