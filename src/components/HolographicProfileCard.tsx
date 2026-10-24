@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { PERSONAL_INFO } from '../data/portfolioData';
+import { useCoarsePointer } from '../hooks/useCoarsePointer';
 
 export const HolographicProfileCard: React.FC = () => {
+  const isCoarse = useCoarsePointer();
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
@@ -10,7 +12,7 @@ export const HolographicProfileCard: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (isCoarse || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -29,9 +31,12 @@ export const HolographicProfileCard: React.FC = () => {
     });
   };
 
-  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseEnter = () => {
+    if (!isCoarse) setIsHovered(true);
+  };
 
   const handleMouseLeave = () => {
+    if (isCoarse) return;
     setIsHovered(false);
     setRotateX(0);
     setRotateY(0);
@@ -39,26 +44,26 @@ export const HolographicProfileCard: React.FC = () => {
   };
 
   const handleFlip = () => {
-    setIsFlipped((prev) => !prev);
+    if (!isCoarse) setIsFlipped((prev) => !prev);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center my-6 select-none perspective-1000">
+    <div className={isCoarse ? "flex flex-col items-center justify-center my-6 select-none" : "flex flex-col items-center justify-center my-6 select-none perspective-1000"}>
       <div
         ref={cardRef}
-        onClick={handleFlip}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className="relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl cursor-pointer transition-transform duration-200 ease-out preserve-3d group shadow-2xl"
-        style={{
+        onClick={isCoarse ? undefined : handleFlip}
+        onMouseMove={isCoarse ? undefined : handleMouseMove}
+        onMouseEnter={isCoarse ? undefined : handleMouseEnter}
+        onMouseLeave={isCoarse ? undefined : handleMouseLeave}
+        className={isCoarse ? "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl group shadow-2xl" : "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl cursor-pointer transition-transform duration-200 ease-out preserve-3d group shadow-2xl"}
+        style={isCoarse ? undefined : {
           transform: `rotateX(${rotateX}deg) rotateY(${isFlipped ? rotateY + 180 : rotateY}deg)`,
         }}
       >
         {/* ================= FRONT SIDE ================= */}
         <div
-          className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#121926] via-[#0d131f] to-[#070a10] overflow-hidden backface-hidden shadow-inner flex flex-col justify-end"
-          style={{
+          className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#121926] via-[#0d131f] to-[#070a10] overflow-hidden shadow-inner flex flex-col justify-end"
+          style={isCoarse ? undefined : {
             backfaceVisibility: 'hidden',
           }}
         >
@@ -107,31 +112,33 @@ export const HolographicProfileCard: React.FC = () => {
           </div>
         </div>
 
-        {/* ================= BACK SIDE ================= */}
-        <div
-          className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#0c1017] via-[#101726] to-[#070a10] p-6 flex flex-col justify-end overflow-hidden shadow-2xl"
-          style={{
-            transform: 'rotateY(180deg)',
-            backfaceVisibility: 'hidden',
-          }}
-        >
-          {/* Subtle back glare */}
+        {/* ================= BACK SIDE (Desktop Only) ================= */}
+        {!isCoarse && (
           <div
-            className="absolute inset-0 pointer-events-none opacity-20"
+            className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#0c1017] via-[#101726] to-[#070a10] p-6 flex flex-col justify-end overflow-hidden shadow-2xl"
             style={{
-              background:
-                'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(59, 130, 246, 0.2))',
+              transform: 'rotateY(180deg)',
+              backfaceVisibility: 'hidden',
             }}
-          />
+          >
+            {/* Subtle back glare */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-20"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(59, 130, 246, 0.2))',
+              }}
+            />
 
-          {/* Back Footer */}
-          <div className="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between font-mono text-[11px] text-slate-400">
-            <span>github.com/{PERSONAL_INFO.githubHandle}</span>
-            <span className="text-slate-300 group-hover:text-red-400 transition-colors flex items-center gap-1 font-semibold">
-              <span>Flip</span> ↺
-            </span>
+            {/* Back Footer */}
+            <div className="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between font-mono text-[11px] text-slate-400">
+              <span>github.com/{PERSONAL_INFO.githubHandle}</span>
+              <span className="text-slate-300 group-hover:text-red-400 transition-colors flex items-center gap-1 font-semibold">
+                <span>Flip</span> ↺
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <p className="mt-3 text-xs font-mono text-slate-500">

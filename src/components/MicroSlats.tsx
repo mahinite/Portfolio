@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { Renderer, Program, Mesh, Triangle, RenderTarget, Texture } from 'ogl';
+import { useCoarsePointer } from '../hooks/useCoarsePointer';
+
+const MOBILE_DPR_CAP = 1;
+const FRAME_INTERVAL_MOBILE = 1000 / 30;
 
 type SwellPreset = 'swell' | 'tide' | 'storm' | 'signal';
 type Rgba = [number, number, number, number];
@@ -463,6 +467,10 @@ export const MicroSlats = ({
   className = '',
   style,
 }: MicroSlatsProps) => {
+  const isCoarse = useCoarsePointer();
+  const isCoarseRef = useRef(isCoarse);
+  isCoarseRef.current = isCoarse;
+
   const containerRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<Settings | null>(null);
   const wakeRef = useRef<(() => void) | null>(null);
@@ -664,6 +672,7 @@ export const MicroSlats = ({
     let height = 1;
     let raf = 0;
     let last = performance.now();
+    let lastRenderTime = performance.now();
     let time = 0;
     let introClock = 0;
     let visible = true;
@@ -733,9 +742,10 @@ export const MicroSlats = ({
     const resize = () => {
       width = Math.max(1, container.clientWidth || window.innerWidth || 1200);
       height = Math.max(1, container.clientHeight || window.innerHeight || 800);
+      const dprLimit = isCoarseRef.current ? MOBILE_DPR_CAP : 2;
       renderer.dpr = Math.min(
         window.devicePixelRatio || 1,
-        2,
+        dprLimit,
         Math.sqrt(PIXEL_BUDGET / (width * height))
       );
       renderer.setSize(width, height);
@@ -851,9 +861,19 @@ export const MicroSlats = ({
       raf = 0;
       if (!alive) return;
       const s = settingsRef.current;
-      const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+      if (!s || s.paused || !visible || document.hidden) return;
+
+      const coarse = isCoarseRef.current;
+      const elapsed = now - lastRenderTime;
+
+      if (coarse && elapsed < FRAME_INTERVAL_MOBILE) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+
+      const dt = Math.min(0.05, Math.max(0, elapsed / 1000));
+      lastRenderTime = now;
       last = now;
-      if (!s) return;
 
       if (!s.paused && !reducedMotion) time += dt * s.speed;
       introClock =
@@ -864,7 +884,11 @@ export const MicroSlats = ({
           ? 4 * introLinear * introLinear * introLinear
           : 1 - Math.pow(-2 * introLinear + 2, 3) / 2;
 
-      if (fluid && splats.length) {
+      if (coarse) {
+        splats.length = 0;
+      }
+
+      if (!coarse && fluid && splats.length) {
         const radius = Math.pow(clamp(s.cursorSize, 4, 600) / height, 2) * 0.35;
         const aspect = width / height;
         for (const [u, v, du, dv, turn] of splats) {
@@ -894,7 +918,7 @@ export const MicroSlats = ({
         splats.length = 0;
         fluidDirty = true;
       }
-      const fluidActive = fluid !== null && now < fluidUntil;
+      const fluidActive = !coarse && fluid !== null && now < fluidUntil;
       if (fluid) {
         if (fluidActive) stepFluid(fluid, Math.min(Math.max(dt, 1 / 240), 1 / 30), s);
         else if (fluidDirty) {
@@ -920,10 +944,10 @@ export const MicroSlats = ({
       fieldUniforms.uFog.value = clamp(s.fog, 0, 1);
       fieldUniforms.uIntro.value = introEase;
       fieldUniforms.uFluid.value = fluidActive ? 1 : 0;
-      fieldUniforms.tVelocity.value = fluid ? fluid.velocity.read.texture : blank;
-      fieldUniforms.tInk.value = fluid ? fluid.ink.read.texture : blank;
+      fieldUniforms.tVelocity.value = (!coarse && fluid) ? fluid.velocity.read.texture : blank;
+      fieldUniforms.tInk.value = (!coarse && fluid) ? fluid.ink.read.texture : blank;
       fieldUniforms.uFluidTexel.value = fluidTexel.value;
-      fieldUniforms.uInk.value = clamp(s.cursorStrength, 0, 3);
+      fieldUniforms.uInk.value = coarse ? 0 : clamp(s.cursorStrength, 0, 3);
       fieldUniforms.uLean.value = clamp(s.lean, 0, 1);
       renderer.render({ scene: fieldMesh, target: fieldTarget });
 
@@ -941,14 +965,28 @@ export const MicroSlats = ({
 
       const moving =
         (!s.paused && !reducedMotion && s.speed !== 0) || introClock < 1;
-      if (visible && (moving || fluidActive || fluidDirty))
+      if (visible && !document.hidden && !s.paused && (moving || fluidActive || fluidDirty))
         raf = requestAnimationFrame(frame);
     };
 
     const start = () => {
-      if (raf || !visible || !alive) return;
+      const s = settingsRef.current;
+      if (raf || !visible || !alive || document.hidden || (s && s.paused)) return;
       last = performance.now();
+      lastRenderTime = performance.now();
       raf = requestAnimationFrame(frame);
+    };
+
+    const handleStateUpdate = () => {
+      const s = settingsRef.current;
+      if (document.hidden || !visible || (s && s.paused)) {
+        if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      } else {
+        start();
+      }
     };
 
     const locate = (e: PointerEvent) => {
@@ -1020,36 +1058,40 @@ export const MicroSlats = ({
     };
 
     const onVisibility = () => {
-      if (!document.hidden) start();
+      handleStateUpdate();
     };
 
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-    window.addEventListener('pointerdown', onPointerDown, { passive: true });
-    window.addEventListener('pointerout', onPointerOut, { passive: true });
-    window.addEventListener('blur', onPointerLeave);
+    if (!isCoarseRef.current) {
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerdown', onPointerDown, { passive: true });
+      window.addEventListener('pointerout', onPointerOut, { passive: true });
+      window.addEventListener('blur', onPointerLeave);
+    }
     document.addEventListener('visibilitychange', onVisibility);
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      start();
+      handleStateUpdate();
     });
     intersectionObserver.observe(container);
 
-    wakeRef.current = start;
+    wakeRef.current = handleStateUpdate;
     resize();
 
     return () => {
       alive = false;
       visible = false;
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('pointerout', onPointerOut);
-      window.removeEventListener('blur', onPointerLeave);
+      if (!isCoarseRef.current) {
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerdown', onPointerDown);
+        window.removeEventListener('pointerout', onPointerOut);
+        window.removeEventListener('blur', onPointerLeave);
+      }
       document.removeEventListener('visibilitychange', onVisibility);
       wakeRef.current = null;
       disposeFluid();

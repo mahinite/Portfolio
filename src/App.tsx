@@ -131,7 +131,7 @@ export default function App() {
           perspective={0.55}
           fog={0.5}
           introDuration={1.5}
-          paused={false}
+          paused={activeModal !== 'none' || isLoreOpen}
         />
       </div>
 
