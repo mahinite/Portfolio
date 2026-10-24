@@ -11,16 +11,25 @@ import { SayHiFooter } from './components/SayHiFooter';
 import { AboutModal } from './components/AboutModal';
 import { LoreModal } from './components/LoreModal';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
-import { ContactModal } from './components/ContactModal';
 import { Toast } from './components/Toast';
 import MicroSlats from './components/MicroSlats';
 import { ModalView, ProjectItem } from './types/portfolio';
 
 export default function App() {
   const [activeModal, setActiveModal] = useState<ModalView>('none');
+  const [isLoreOpen, setIsLoreOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Lock body scroll whenever any modal is active
+  useEffect(() => {
+    if (activeModal !== 'none' || isLoreOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [activeModal, isLoreOpen]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -31,39 +40,40 @@ export default function App() {
 
   const handleOpenAbout = () => {
     setActiveModal('about');
+    setIsLoreOpen(false);
   };
 
   const handleOpenLore = () => {
-    setActiveModal('lore');
+    setActiveModal('about');
+    setIsLoreOpen(true);
   };
 
-  const handleBackToAbout = () => {
-    setActiveModal('about');
+  const handleCloseLore = () => {
+    setIsLoreOpen(false);
   };
 
   const handleOpenProjects = () => {
     setSelectedProject(null);
+    setIsLoreOpen(false);
     setActiveModal('project');
   };
 
   const handleSelectProject = (project: ProjectItem) => {
     setSelectedProject(project);
+    setIsLoreOpen(false);
     setActiveModal('project');
-  };
-
-  const handleOpenContact = () => {
-    setActiveModal('contact');
   };
 
   const handleCloseModal = () => {
     setActiveModal('none');
+    setIsLoreOpen(false);
   };
 
   const handleScrollDown = () => {
     const bento = document.getElementById('bento-section');
     if (bento) {
       bento.scrollIntoView({ behavior: 'smooth' });
-      setActiveSection('projects');
+      setActiveSection('about');
     }
   };
 
@@ -71,16 +81,23 @@ export default function App() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      if (scrollY < 400) {
+      const bentoEl = document.getElementById('bento-section');
+      const contactEl = document.getElementById('contact-section');
+
+      const bentoTop = bentoEl ? bentoEl.offsetTop - 180 : 500;
+      const contactTop = contactEl ? contactEl.offsetTop - 240 : 1300;
+
+      if (scrollY < bentoTop) {
         setActiveSection('hero');
-      } else if (scrollY < 1200) {
-        setActiveSection('projects');
+      } else if (scrollY < contactTop) {
+        setActiveSection('about');
       } else {
         setActiveSection('contact');
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -124,7 +141,10 @@ export default function App() {
         <Navigation
           activeSection={activeSection}
           onNavigate={(sec) => setActiveSection(sec)}
-          onOpenModal={(modal) => setActiveModal(modal)}
+          onOpenModal={(modal) => {
+            setActiveModal(modal);
+            setIsLoreOpen(false);
+          }}
         />
 
         {/* Main Page Layout (lives on top of MicroSlats background) */}
@@ -144,7 +164,6 @@ export default function App() {
 
           {/* Screen 3: Say hi 3D Footer */}
           <SayHiFooter
-            onOpenContact={handleOpenContact}
             onShowToast={showToast}
           />
         </main>
@@ -153,26 +172,21 @@ export default function App() {
       {/* Interactive Modals */}
       <AboutModal
         isOpen={activeModal === 'about'}
+        isLoreOpen={isLoreOpen}
         onClose={handleCloseModal}
         onOpenLore={handleOpenLore}
       />
 
       <LoreModal
-        isOpen={activeModal === 'lore'}
-        onClose={handleCloseModal}
-        onBackToAbout={handleBackToAbout}
+        isOpen={isLoreOpen && activeModal === 'about'}
+        onClose={handleCloseLore}
+        onBackToAbout={handleCloseLore}
       />
 
       <ProjectDetailModal
         isOpen={activeModal === 'project'}
         initialProject={selectedProject}
         onClose={handleCloseModal}
-      />
-
-      <ContactModal
-        isOpen={activeModal === 'contact'}
-        onClose={handleCloseModal}
-        onShowToast={showToast}
       />
 
       {/* Global Toast Feedback */}

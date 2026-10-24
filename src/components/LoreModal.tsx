@@ -27,11 +27,9 @@ export const LoreModal: React.FC<LoreModalProps> = ({
       }
     };
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
-      document.body.style.overflow = 'auto';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, selectedChapter, onClose]);
@@ -39,9 +37,9 @@ export const LoreModal: React.FC<LoreModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#080c14]/95 backdrop-blur-2xl animate-fadeIn">
+    <div className="fixed inset-0 z-[60] overflow-y-auto bg-[#080c14]/90 backdrop-blur-2xl animate-modal-backdrop">
       {/* Top Header Bar */}
-      <div className="sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8">
+      <div className="sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8 animate-modal-slide-up">
         <button
           onClick={onBackToAbout}
           className="font-mono text-xs text-slate-300 hover:text-white underline underline-offset-4 decoration-slate-600 hover:decoration-white transition-all flex items-center gap-1.5 cursor-pointer"
@@ -58,49 +56,48 @@ export const LoreModal: React.FC<LoreModalProps> = ({
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 pb-24 pt-4">
+      <div className="max-w-3xl mx-auto px-6 pb-24 pt-4 animate-modal-slide-up">
         {/* Lore Heading */}
         <div className="mb-12">
           <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight">
             Lore
           </h1>
-          <p className="mt-2 font-mono text-xs text-slate-400">
-            Personal chapters, gaming nostalgia, and late-night build stories. Click any chapter to read.
-          </p>
         </div>
 
         {/* Chapters List */}
-        <div className="space-y-8">
-          {LORE_CHAPTERS.map((chapter) => (
-            <div
-              key={chapter.id}
-              onClick={() => setSelectedChapter(chapter)}
-              className="group flex items-start gap-4 sm:gap-6 p-4 -mx-4 rounded-xl hover:bg-white/[0.03] border border-transparent hover:border-white/5 transition-all duration-200 cursor-pointer"
-            >
-              {/* Category Pill Tag */}
-              <div className="shrink-0 pt-0.5">
-                <span className="px-3 py-1 rounded-full text-xs font-mono text-slate-400 border border-white/10 bg-white/[0.02] group-hover:border-red-500/40 group-hover:text-red-300 transition-colors">
-                  {chapter.badge}
-                </span>
-              </div>
-
-              {/* Title & Preview */}
-              <div className="space-y-1 flex-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-red-400 transition-colors">
-                    {chapter.title}
-                  </h3>
-                  <span className="text-xs font-mono text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Read chapter →
+        {LORE_CHAPTERS.length > 0 && (
+          <div className="space-y-8">
+            {LORE_CHAPTERS.map((chapter) => (
+              <div
+                key={chapter.id}
+                onClick={() => setSelectedChapter(chapter)}
+                className="group flex items-start gap-4 sm:gap-6 p-4 -mx-4 rounded-xl hover:bg-white/[0.03] border border-transparent hover:border-white/5 transition-all duration-200 cursor-pointer"
+              >
+                {/* Category Pill Tag */}
+                <div className="shrink-0 pt-0.5">
+                  <span className="px-3 py-1 rounded-full text-xs font-mono text-slate-400 border border-white/10 bg-white/[0.02] group-hover:border-red-500/40 group-hover:text-red-300 transition-colors">
+                    {chapter.badge}
                   </span>
                 </div>
-                <p className="text-sm text-slate-400 font-normal">
-                  {chapter.subtitle}
-                </p>
+
+                {/* Title & Preview */}
+                <div className="space-y-1 flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-red-400 transition-colors">
+                      {chapter.title}
+                    </h3>
+                    <span className="text-xs font-mono text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Read chapter →
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-400 font-normal">
+                    {chapter.subtitle}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Chapter Detail Slide-over / Modal */}

@@ -101,64 +101,7 @@ export const PROJECTS: ProjectItem[] = [
   }
 ];
 
-export const LORE_CHAPTERS: LoreItem[] = [
-  {
-    id: 'minecraft',
-    badge: 'play',
-    title: 'Minecraft with the cousins',
-    subtitle: 'A favorite memory goes here.',
-    date: 'Summer Nights · 2021 - Present',
-    story:
-      'Every summer holiday and late Friday night, all the cousins would gather on Discord and launch a fresh survival server. We would build massive underwater domes, Nether highway networks, and automated iron farms while trading banter till 4 AM. Those chaotic multiplayer sessions were where I first fell in love with complex logic systems, redstone circuitry, and collaborative community building.',
-    highlights: [
-      'Endless survival worlds where we built entire virtual mountain villages',
-      'Redstone contraptions that sparked my early curiosity in Boolean logic',
-      'Midnight voice calls filled with monsoon thunderstorm sounds in the background'
-    ]
-  },
-  {
-    id: 'codm',
-    badge: 'play',
-    title: 'Competitive Call of Duty Mobile',
-    subtitle: 'Team, tournaments, best moment.',
-    date: 'Championship Era · 2022 - 2024',
-    story:
-      'Grinding rank with a close-knit squad taught me how to communicate under extreme split-second pressure. Playing the entry-fragger and sniper role in regional community scrims required laser discipline, map knowledge, and predictive game sense. The high point was clutching a 1v4 Search & Destroy match with seconds remaining on the bomb defuse.',
-    highlights: [
-      'Legendary tier consecutive seasons as squad shot-caller',
-      'Practicing tactical coordination, smoke execution, and retake strategies',
-      'Taught me high-pressure decision making and rapid adaptation under fire'
-    ]
-  },
-  {
-    id: 'yuki',
-    badge: 'life',
-    title: 'Yuki, my cat',
-    subtitle: 'Yuki means snow in Japanese.',
-    date: 'Family Member · Dhaka',
-    story:
-      'Yuki is our pure white, endlessly curious cat named after "snow" in Japanese. She loves sitting directly on my mechanical keyboard right as a critical build finishes, or curling up beside the monitor while I debug code into the evening. She is officially my most demanding rubber-duck debugging companion.',
-    highlights: [
-      'Loves naps on warm laptop chargers and sunny window sills',
-      'Has attended countless late-night coding sessions as silent moral support',
-      'Unmatched curiosity about moving code cursors and laser pointers'
-    ]
-  },
-  {
-    id: 'ai-agents',
-    badge: 'build',
-    title: 'Building with AI agents',
-    subtitle: 'Shelf, TAWT, SoundMesh.',
-    date: 'The Modern Chapter · 2024 - Present',
-    story:
-      'What began as simple prompt tinkering evolved into architecting full-blown agentic workflows. When building Shelf, TAWT, and SoundMesh, I realized that modern AI tooling allows a single determined builder in Dhaka to construct systems that previously required entire software engineering departments. The future belongs to those who combine genuine empathy for user problems with autonomous execution.',
-    highlights: [
-      'Moving from simple chat interfaces to autonomous tool-calling pipelines',
-      'Building custom tools to solve friction points in my own daily student routine',
-      'Continuously exploring prompt engineering, vector search, and multimodal agent UX'
-    ]
-  }
-];
+export const LORE_CHAPTERS: LoreItem[] = [];
 
 export const ASCII_PORTRAIT = `              .::::::.              
           .:-==++++==--:.          

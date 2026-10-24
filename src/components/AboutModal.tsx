@@ -4,46 +4,47 @@ import { PERSONAL_INFO } from '../data/portfolioData';
 
 interface AboutModalProps {
   isOpen: boolean;
+  isLoreOpen?: boolean;
   onClose: () => void;
   onOpenLore: () => void;
 }
 
 export const AboutModal: React.FC<AboutModalProps> = ({
   isOpen,
+  isLoreOpen = false,
   onClose,
   onOpenLore,
 }) => {
   // Listen for Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && !isLoreOpen) onClose();
     };
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
-      document.body.style.overflow = 'auto';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, isLoreOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#080c14]/95 backdrop-blur-2xl animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop">
       {/* Top Bar with Close Button */}
-      <div className="sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8">
+      <div className="sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8 animate-modal-slide-up">
         <button
           onClick={onClose}
-          className="w-10 h-10 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center transition-all cursor-pointer group"
+          className="w-10 h-10 rounded-full border border-[#d94551]/30 bg-[#d94551]/10 hover:bg-[#d94551]/20 hover:border-[#d94551]/60 text-[#d94551] flex items-center justify-center transition-all cursor-pointer group"
+          style={{ color: '#d94551' }}
           aria-label="Close modal"
         >
           <span className="text-lg group-hover:scale-110 transition-transform">✕</span>
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 pb-20 pt-2 flex flex-col items-center text-center">
+      <div className="max-w-3xl mx-auto px-6 pb-20 pt-2 flex flex-col items-center text-center animate-modal-slide-up">
 
         {/* Full Name */}
         <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
@@ -88,7 +89,10 @@ export const AboutModal: React.FC<AboutModalProps> = ({
           className="w-full max-w-xl rounded-2xl border border-white/[0.08] bg-[#0d131f]/90 p-6 sm:p-7 text-left hover:border-white/20 transition-all duration-300 shadow-xl cursor-pointer group mt-4"
         >
           <div className="flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl font-extrabold text-red-500 tracking-wider">
+            <h2
+              className="text-xl sm:text-2xl font-extrabold tracking-wider"
+              style={{ color: '#d94551' }}
+            >
               LORE
             </h2>
             <span className="text-amber-400 group-hover:translate-x-1.5 group-hover:text-amber-300 transition-all text-lg font-mono">
