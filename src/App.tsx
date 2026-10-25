@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Navigation } from './components/Navigation';
 import { HeroSection } from './components/HeroSection';
 import { BentoGrid } from './components/BentoGrid';
@@ -22,6 +22,40 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [heroVisible, setHeroVisible] = useState(true);
+  const heroFadeRef = useRef(1);
+
+  // Compute hero fade level for cursor effects, throttled with requestAnimationFrame
+  useEffect(() => {
+    const FADE_START = 0.5;
+    let rafId = 0;
+
+    const updateFade = () => {
+      rafId = 0;
+      const heroEl = document.getElementById('hero');
+      if (!heroEl) return;
+      const rect = heroEl.getBoundingClientRect();
+      const ratio = rect.height > 0 ? rect.bottom / rect.height : 0;
+      const x = Math.max(0, Math.min(1, ratio / FADE_START));
+      const f = x * x * (3 - 2 * x); // smoothstep(0, FADE_START, ratio)
+      heroFadeRef.current = Math.max(0, Math.min(1, f));
+    };
+
+    const onScrollOrResize = () => {
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateFade);
+      }
+    };
+
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize, { passive: true });
+    updateFade();
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', onScrollOrResize);
+      window.removeEventListener('resize', onScrollOrResize);
+    };
+  }, []);
 
   // Freeze MicroSlats when hero is out of view (all tiers)
   useEffect(() => {
@@ -96,12 +130,19 @@ export default function App() {
     }
   };
 
-  // Track scroll position for active section
+  // Track scroll position for active section and hero visibility
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const bentoEl = document.getElementById('bento-section');
       const contactEl = document.getElementById('contact-section');
+      const heroEl = document.getElementById('hero');
+
+      // Initiate micro slats freeze after the hero window has scrolled out of view
+      if (heroEl) {
+        const rect = heroEl.getBoundingClientRect();
+        setHeroVisible(rect.bottom > 0);
+      }
 
       const bentoTop = bentoEl ? bentoEl.offsetTop - 180 : 500;
       const contactTop = contactEl ? contactEl.offsetTop - 240 : 1300;
@@ -151,6 +192,7 @@ export default function App() {
           fog={0.5}
           introDuration={1.5}
           paused={activeModal !== 'none' || isLoreOpen || !heroVisible}
+          effectLevelRef={heroFadeRef}
         />
       </div>
 

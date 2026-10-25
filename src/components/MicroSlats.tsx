@@ -40,6 +40,7 @@ export interface MicroSlatsProps extends Partial<WaveValues> {
   intro?: boolean;
   introDuration?: number;
   paused?: boolean;
+  effectLevelRef?: React.MutableRefObject<number> | React.RefObject<number | null> | { current: number };
   className?: string;
   style?: CSSProperties;
 }
@@ -465,9 +466,13 @@ export const MicroSlats = ({
   intro = true,
   introDuration = 1.5,
   paused = false,
+  effectLevelRef,
   className = '',
   style,
 }: MicroSlatsProps) => {
+  const effectLevelRefProp = useRef(effectLevelRef);
+  effectLevelRefProp.current = effectLevelRef;
+
   const isCoarse = useCoarsePointer();
   const isCoarseRef = useRef(isCoarse);
   isCoarseRef.current = isCoarse;
@@ -919,6 +924,11 @@ export const MicroSlats = ({
       });
     };
 
+    const getEffectLevel = () => {
+      const raw = effectLevelRefProp.current ? effectLevelRefProp.current.current : 1;
+      return clamp(typeof raw === 'number' ? raw : 1, 0, 1);
+    };
+
     const frame = (now: number) => {
       raf = 0;
       if (!alive) return;
@@ -926,6 +936,7 @@ export const MicroSlats = ({
       if (!s || s.paused || !visible || document.hidden) return;
 
       const coarse = isCoarseRef.current;
+      const L = getEffectLevel();
       const elapsed = now - lastRenderTime;
 
       if (coarse && elapsed < FRAME_INTERVAL_MOBILE) {
@@ -946,11 +957,11 @@ export const MicroSlats = ({
           ? 4 * introLinear * introLinear * introLinear
           : 1 - Math.pow(-2 * introLinear + 2, 3) / 2;
 
-      if (coarse) {
+      if (coarse || L < 0.02) {
         splats.length = 0;
       }
 
-      if (!coarse && fluid && splats.length) {
+      if (!coarse && L >= 0.02 && fluid && splats.length) {
         const radius = Math.pow(clamp(s.cursorSize, 4, 600) / height, 2) * 0.35;
         const aspect = width / height;
         for (const [u, v, du, dv, turn] of splats) {
@@ -1009,8 +1020,8 @@ export const MicroSlats = ({
       fieldUniforms.tVelocity.value = (!coarse && fluid) ? fluid.velocity.read.texture : blank;
       fieldUniforms.tInk.value = (!coarse && fluid) ? fluid.ink.read.texture : blank;
       fieldUniforms.uFluidTexel.value = fluidTexel.value;
-      fieldUniforms.uInk.value = coarse ? 0 : clamp(s.cursorStrength, 0, 3);
-      fieldUniforms.uLean.value = clamp(s.lean, 0, 1);
+      fieldUniforms.uInk.value = (coarse ? 0 : clamp(s.cursorStrength, 0, 3)) * L;
+      fieldUniforms.uLean.value = clamp(s.lean, 0, 1) * L;
       renderer.render({ scene: fieldMesh, target: fieldTarget });
 
       slatUniforms.uSize.value = [width, height];
@@ -1019,7 +1030,7 @@ export const MicroSlats = ({
       slatUniforms.uOrigin.value = grid.origin;
       slatUniforms.uSlat.value = [grid.slatW, grid.slatH];
       slatUniforms.uRound.value = clamp(s.roundness, 0, 1);
-      slatUniforms.uTilt.value = fluidActive && s.lean > 0 ? grid.tilt : 0;
+      slatUniforms.uTilt.value = (fluidActive && s.lean > 0 ? grid.tilt : 0) * L;
       slatUniforms.uColor.value = s.color.slice(0, 3);
       slatUniforms.uGlintColor.value = s.glintColor.slice(0, 3);
       slatUniforms.uBackground.value = s.backgroundColor;
@@ -1039,14 +1050,54 @@ export const MicroSlats = ({
       raf = requestAnimationFrame(frame);
     };
 
+    let wasPaused = settingsRef.current?.paused ?? false;
+
+    const renderCleanFreeze = () => {
+      if (!alive) return;
+      const s = settingsRef.current;
+      if (!s) return;
+
+      fieldUniforms.uInk.value = 0;
+      fieldUniforms.uLean.value = 0;
+      renderer.render({ scene: fieldMesh, target: fieldTarget });
+
+      slatUniforms.uTilt.value = 0;
+      renderer.render({ scene: slatMesh });
+
+      if (fluid) {
+        clearFluid(fluid);
+      }
+      splats.length = 0;
+      fluidDirty = false;
+    };
+
     const handleStateUpdate = () => {
       const s = settingsRef.current;
-      if (document.hidden || !visible || (s && s.paused) || qualityRef.current === 'minimal') {
+      const isPaused = Boolean(document.hidden || !visible || (s && s.paused) || qualityRef.current === 'minimal');
+
+      if (isPaused) {
         if (raf) {
           cancelAnimationFrame(raf);
           raf = 0;
         }
+        if (s && s.paused && !wasPaused) {
+          wasPaused = true;
+          const L = getEffectLevel();
+          if (L <= 0) {
+            renderCleanFreeze();
+          }
+        } else if (s && s.paused) {
+          wasPaused = true;
+        }
       } else {
+        if (wasPaused) {
+          wasPaused = false;
+          const L = getEffectLevel();
+          if (L <= 0) {
+            splats.length = 0;
+            if (fluid) clearFluid(fluid);
+          }
+        }
         start();
       }
     };
@@ -1074,6 +1125,10 @@ export const MicroSlats = ({
       dv: number,
       turn: number | null
     ) => {
+      if (getEffectLevel() < 0.02) {
+        splats.length = 0;
+        return;
+      }
       if (splats.length > 32) splats.shift();
       splats.push([u, v, du, dv, turn]);
       const s = settingsRef.current;
@@ -1085,7 +1140,7 @@ export const MicroSlats = ({
     const onPointerMove = (e: PointerEvent) => {
       const s = settingsRef.current;
       const spot = locate(e);
-      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside) {
+      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside || getEffectLevel() < 0.02) {
         pointer.tracked = false;
         return;
       }
@@ -1106,7 +1161,7 @@ export const MicroSlats = ({
     const onPointerDown = (e: PointerEvent) => {
       const s = settingsRef.current;
       const spot = locate(e);
-      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside) return;
+      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside || getEffectLevel() < 0.02) return;
       splashTurn += 2.39996;
       queue(spot.u, spot.v, 0, 0, splashTurn);
     };
