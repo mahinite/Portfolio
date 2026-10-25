@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LORE_CHAPTERS } from '../data/portfolioData';
 import { LoreItem } from '../types/portfolio';
-import { useLowPower } from '../hooks/useLowPower';
+import { useQuality } from '../hooks/useQuality';
 
 interface LoreModalProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ export const LoreModal: React.FC<LoreModalProps> = ({
   onClose,
   onBackToAbout,
 }) => {
-  const isLowPower = useLowPower();
+  const quality = useQuality();
   const [selectedChapter, setSelectedChapter] = useState<LoreItem | null>(null);
 
   // Keyboard accessibility
@@ -41,7 +41,9 @@ export const LoreModal: React.FC<LoreModalProps> = ({
   return (
     <div
       className={`fixed inset-0 z-[60] overflow-y-auto ${
-        isLowPower
+        quality === 'minimal'
+          ? 'bg-[#080c14] animate-modal-backdrop-minimal'
+          : quality === 'lite'
           ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
           : 'bg-[#080c14]/90 backdrop-blur-2xl animate-modal-backdrop'
       }`}
@@ -49,7 +51,11 @@ export const LoreModal: React.FC<LoreModalProps> = ({
       {/* Top Header Bar */}
       <div
         className={`sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8 ${
-          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+          quality === 'minimal'
+            ? 'animate-modal-slide-up-minimal'
+            : quality === 'lite'
+            ? 'animate-modal-slide-up-lowpower'
+            : 'animate-modal-slide-up'
         }`}
       >
         <button
@@ -71,7 +77,11 @@ export const LoreModal: React.FC<LoreModalProps> = ({
 
       <div
         className={`max-w-3xl mx-auto px-6 pb-24 pt-4 ${
-          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+          quality === 'minimal'
+            ? 'animate-modal-slide-up-minimal'
+            : quality === 'lite'
+            ? 'animate-modal-slide-up-lowpower'
+            : 'animate-modal-slide-up'
         }`}
       >
         {/* Lore Heading */}
@@ -121,7 +131,9 @@ export const LoreModal: React.FC<LoreModalProps> = ({
       {selectedChapter && (
         <div
           className={`fixed inset-0 z-60 flex items-center justify-center p-4 sm:p-6 ${
-            isLowPower
+            quality === 'minimal'
+              ? 'bg-[#080c14] animate-modal-backdrop-minimal'
+              : quality === 'lite'
               ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
               : 'bg-black/80 backdrop-blur-md animate-fadeIn'
           }`}

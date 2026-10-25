@@ -115,6 +115,38 @@
   animation: modalSlideUpLowPower 0.18s ease-out forwards;
 }
 
+@keyframes modalFadeInMinimal {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-modal-backdrop-minimal {
+  animation: modalFadeInMinimal 100ms ease-out forwards;
+}
+
+.animate-modal-slide-up-minimal {
+  animation: modalFadeInMinimal 100ms ease-out forwards;
+}
+
+/* Minimal Tier Global Motion Reset */
+html[data-quality="minimal"] {
+  scroll-behavior: auto !important;
+}
+
+html[data-quality="minimal"] *:not([class*="animate-modal-"]),
+html[data-quality="minimal"] *:not([class*="animate-modal-"])::before,
+html[data-quality="minimal"] *:not([class*="animate-modal-"])::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  animation-delay: 0s !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+}
+
 /* Custom subtle scrollbars */
 ::-webkit-scrollbar {
   width: 6px;

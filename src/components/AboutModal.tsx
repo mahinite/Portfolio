@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { HolographicProfileCard } from './HolographicProfileCard';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { useLowPower } from '../hooks/useLowPower';
+import { useQuality } from '../hooks/useQuality';
 
 interface AboutModalProps {
   isOpen: boolean;
@@ -16,7 +16,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
   onClose,
   onOpenLore,
 }) => {
-  const isLowPower = useLowPower();
+  const quality = useQuality();
 
   // Listen for Escape key
   useEffect(() => {
@@ -36,7 +36,9 @@ export const AboutModal: React.FC<AboutModalProps> = ({
   return (
     <div
       className={`fixed inset-0 z-50 overflow-y-auto ${
-        isLowPower
+        quality === 'minimal'
+          ? 'bg-[#080c14] animate-modal-backdrop-minimal'
+          : quality === 'lite'
           ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
           : 'bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop'
       }`}
@@ -44,7 +46,11 @@ export const AboutModal: React.FC<AboutModalProps> = ({
       {/* Top Bar with Close Button */}
       <div
         className={`sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8 ${
-          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+          quality === 'minimal'
+            ? 'animate-modal-slide-up-minimal'
+            : quality === 'lite'
+            ? 'animate-modal-slide-up-lowpower'
+            : 'animate-modal-slide-up'
         }`}
       >
         <button
@@ -59,7 +65,11 @@ export const AboutModal: React.FC<AboutModalProps> = ({
 
       <div
         className={`max-w-3xl mx-auto px-6 pb-20 pt-2 flex flex-col items-center text-center ${
-          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+          quality === 'minimal'
+            ? 'animate-modal-slide-up-minimal'
+            : quality === 'lite'
+            ? 'animate-modal-slide-up-lowpower'
+            : 'animate-modal-slide-up'
         }`}
       >
 

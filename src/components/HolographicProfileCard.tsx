@@ -1,9 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useCoarsePointer } from '../hooks/useCoarsePointer';
+import { useQuality } from '../hooks/useQuality';
 
 export const HolographicProfileCard: React.FC = () => {
   const isCoarse = useCoarsePointer();
+  const quality = useQuality();
+  const isStatic = isCoarse || quality === 'minimal';
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
@@ -11,7 +14,7 @@ export const HolographicProfileCard: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isCoarse || !cardRef.current) return;
+    if (isStatic || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -31,11 +34,11 @@ export const HolographicProfileCard: React.FC = () => {
   };
 
   const handleMouseEnter = () => {
-    if (!isCoarse) setIsHovered(true);
+    if (!isStatic) setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
-    if (isCoarse) return;
+    if (isStatic) return;
     setIsHovered(false);
     setRotateX(0);
     setRotateY(0);
@@ -43,14 +46,14 @@ export const HolographicProfileCard: React.FC = () => {
   };
 
   return (
-    <div className={isCoarse ? "flex flex-col items-center justify-center my-6 select-none" : "flex flex-col items-center justify-center my-6 select-none perspective-1000"}>
+    <div className={isStatic ? "flex flex-col items-center justify-center my-6 select-none" : "flex flex-col items-center justify-center my-6 select-none perspective-1000"}>
       <div
         ref={cardRef}
-        onMouseMove={isCoarse ? undefined : handleMouseMove}
-        onMouseEnter={isCoarse ? undefined : handleMouseEnter}
-        onMouseLeave={isCoarse ? undefined : handleMouseLeave}
-        className={isCoarse ? "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl group shadow-2xl" : "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl transition-transform duration-200 ease-out group shadow-2xl"}
-        style={isCoarse ? undefined : {
+        onMouseMove={isStatic ? undefined : handleMouseMove}
+        onMouseEnter={isStatic ? undefined : handleMouseEnter}
+        onMouseLeave={isStatic ? undefined : handleMouseLeave}
+        className={isStatic ? "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl group shadow-2xl" : "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl transition-transform duration-200 ease-out group shadow-2xl"}
+        style={isStatic ? undefined : {
           transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
         }}
       >

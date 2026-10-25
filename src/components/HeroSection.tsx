@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AsciiPortraitCard } from './AsciiPortraitCard';
 import { PERSONAL_INFO } from '../data/portfolioData';
+import { useQuality } from '../hooks/useQuality';
 
 interface HeroSectionProps {
   onOpenAbout: () => void;
@@ -15,11 +16,15 @@ const PHRASES = [
 ];
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAbout, onScrollDown }) => {
+  const quality = useQuality();
+  const isMinimal = quality === 'minimal';
   const [phraseIndex, setPhraseIndex] = useState(0);
-  const [displayText, setDisplayText] = useState('');
+  const [displayText, setDisplayText] = useState(isMinimal ? PHRASES[0] : '');
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
+    if (isMinimal) return;
+
     const currentPhrase = PHRASES[phraseIndex];
     const typingSpeed = isDeleting ? 45 : 95;
 
@@ -42,10 +47,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAbout, onScrollD
     }, typingSpeed);
 
     return () => clearTimeout(timer);
-  }, [displayText, isDeleting, phraseIndex]);
+  }, [displayText, isDeleting, phraseIndex, isMinimal]);
+
+  const activeText = isMinimal ? PHRASES[0] : displayText;
 
   return (
-    <section className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-between max-w-6xl mx-auto px-6 pt-10 pb-8 sm:py-16">
+    <section id="hero" className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-between max-w-6xl mx-auto px-6 pt-10 pb-8 sm:py-16">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center my-auto">
         {/* Left Column: Heading & Typewriter */}
         <div className="lg:col-span-7 space-y-6">
@@ -62,7 +69,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAbout, onScrollD
           <div className="text-2xl sm:text-3xl text-slate-300 font-normal flex items-baseline flex-wrap gap-2 pt-2">
             <span>I build</span>
             <span className="font-semibold text-white">
-              {displayText}
+              {activeText}
               <span className="text-red-500 font-bold ml-0.5 animate-cursor-blink">|</span>
             </span>
           </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { LiveWatchCard } from './LiveWatchCard';
 import { PROJECTS, TECH_MARQUEE_ITEMS } from '../data/portfolioData';
 import { ProjectItem } from '../types/portfolio';
+import { useQuality } from '../hooks/useQuality';
 
 interface BentoGridProps {
   onOpenAbout: () => void;
@@ -14,6 +15,8 @@ export const BentoGrid: React.FC<BentoGridProps> = ({
   onOpenProjects,
   onSelectProject,
 }) => {
+  const quality = useQuality();
+
   return (
     <section id="bento-section" className="max-w-6xl mx-auto px-6 py-12 space-y-6">
       {/* Top 3-Card Grid */}
@@ -113,7 +116,9 @@ export const BentoGrid: React.FC<BentoGridProps> = ({
       </div>
 
       {/* Card 5: Infinite Marquee Tech Ticker */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#0d131f]/60 py-4 px-2 overflow-hidden backdrop-blur-sm shadow-md">
+      <div className={`rounded-2xl border border-white/[0.08] py-4 px-2 overflow-hidden shadow-md ${
+        quality === 'full' ? 'bg-[#0d131f]/60 backdrop-blur-sm' : 'bg-[#0d131f]/85'
+      }`}>
         <div className="animate-marquee items-center gap-8 text-sm sm:text-base font-mono text-slate-300 font-medium select-none">
           {/* Double array for seamless infinite loop */}
           {[...TECH_MARQUEE_ITEMS, ...TECH_MARQUEE_ITEMS].map((tech, idx) => (

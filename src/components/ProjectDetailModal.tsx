@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PROJECTS } from '../data/portfolioData';
 import { ProjectItem } from '../types/portfolio';
-import { useLowPower } from '../hooks/useLowPower';
+import { useQuality } from '../hooks/useQuality';
 
 interface ProjectDetailModalProps {
   isOpen: boolean;
@@ -51,7 +51,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   initialProject,
   onClose,
 }) => {
-  const isLowPower = useLowPower();
+  const quality = useQuality();
   const [activeProject, setActiveProject] = useState<ProjectItem>(
     initialProject || PROJECTS[0]
   );
@@ -81,7 +81,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   return (
     <div
       className={`fixed inset-0 z-50 overflow-y-auto ${
-        isLowPower
+        quality === 'minimal'
+          ? 'bg-[#080c14] animate-modal-backdrop-minimal'
+          : quality === 'lite'
           ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
           : 'bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop'
       }`}
@@ -89,7 +91,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       {/* Top Bar */}
       <div
         className={`sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8 ${
-          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+          quality === 'minimal'
+            ? 'animate-modal-slide-up-minimal'
+            : quality === 'lite'
+            ? 'animate-modal-slide-up-lowpower'
+            : 'animate-modal-slide-up'
         }`}
       >
         <button
@@ -104,7 +110,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
       <div
         className={`max-w-4xl mx-auto px-6 pb-20 pt-2 space-y-8 ${
-          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+          quality === 'minimal'
+            ? 'animate-modal-slide-up-minimal'
+            : quality === 'lite'
+            ? 'animate-modal-slide-up-lowpower'
+            : 'animate-modal-slide-up'
         }`}
       >
         {/* Project Selector Tabs */}

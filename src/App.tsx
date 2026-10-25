@@ -21,6 +21,25 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [heroVisible, setHeroVisible] = useState(true);
+
+  // Freeze MicroSlats when hero is out of view (all tiers)
+  useEffect(() => {
+    const heroEl = document.getElementById('hero');
+    if (!heroEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry) {
+          setHeroVisible(entry.isIntersecting);
+        }
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(heroEl);
+    return () => observer.disconnect();
+  }, []);
 
   // Lock body scroll whenever any modal is active
   useEffect(() => {
@@ -131,7 +150,7 @@ export default function App() {
           perspective={0.55}
           fog={0.5}
           introDuration={1.5}
-          paused={activeModal !== 'none' || isLoreOpen}
+          paused={activeModal !== 'none' || isLoreOpen || !heroVisible}
         />
       </div>
 

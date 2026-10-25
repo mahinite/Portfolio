@@ -1,6 +1,7 @@
 import React from 'react';
 import { ModalView } from '../types/portfolio';
 import { RandomLetterSwap } from './ui/random-letter-swap';
+import { useQuality } from '../hooks/useQuality';
 
 interface NavigationProps {
   activeSection: string;
@@ -13,8 +14,12 @@ export const Navigation: React.FC<NavigationProps> = ({
   onNavigate,
   onOpenModal,
 }) => {
+  const quality = useQuality();
+
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#0b0f17]/80 border-b border-white/[0.04] transition-all">
+    <header className={`sticky top-0 z-40 w-full border-b border-white/[0.04] transition-all ${
+      quality === 'full' ? 'backdrop-blur-md bg-[#0b0f17]/80' : 'bg-[#0b0f17]/95'
+    }`}>
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-center">
         {/* Nav Zone with RandomLetterSwap effect */}
         <nav className="flex items-center gap-8">

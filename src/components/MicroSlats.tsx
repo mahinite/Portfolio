@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { Renderer, Program, Mesh, Triangle, RenderTarget, Texture } from 'ogl';
 import { useCoarsePointer } from '../hooks/useCoarsePointer';
+import { useQuality } from '../hooks/useQuality';
 
 const MOBILE_DPR_CAP = 1;
 const FRAME_INTERVAL_MOBILE = 1000 / 30;
@@ -471,6 +472,10 @@ export const MicroSlats = ({
   const isCoarseRef = useRef(isCoarse);
   isCoarseRef.current = isCoarse;
 
+  const quality = useQuality();
+  const qualityRef = useRef(quality);
+  qualityRef.current = quality;
+
   const containerRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<Settings | null>(null);
   const wakeRef = useRef<(() => void) | null>(null);
@@ -739,20 +744,6 @@ export const MicroSlats = ({
       fluidTexel.value = [1 / w, 1 / h];
     };
 
-    const resize = () => {
-      width = Math.max(1, container.clientWidth || window.innerWidth || 1200);
-      height = Math.max(1, container.clientHeight || window.innerHeight || 800);
-      const dprLimit = isCoarseRef.current ? MOBILE_DPR_CAP : 2;
-      renderer.dpr = Math.min(
-        window.devicePixelRatio || 1,
-        dprLimit,
-        Math.sqrt(PIXEL_BUDGET / (width * height))
-      );
-      renderer.setSize(width, height);
-      buildFluid();
-      start();
-    };
-
     const layout = (s: Settings): GridLayout => {
       const slatW = clamp(s.slatWidth, 1, 64);
       const slatH = clamp(s.slatHeight, 2, 240);
@@ -785,6 +776,77 @@ export const MicroSlats = ({
         grid: [cols, rows, pitchX, pitchY],
         origin: [originX, originY],
       };
+    };
+
+    const renderSingleFrame = () => {
+      if (!alive) return;
+      const s = settingsRef.current;
+      if (!s) return;
+
+      if (introClock === 0 && time === 0) {
+        introClock = 1;
+        time = Math.max(1.5, s.introDuration);
+      }
+
+      const introLinear = Math.min(introClock, 1);
+      const introEase =
+        introLinear < 0.5
+          ? 4 * introLinear * introLinear * introLinear
+          : 1 - Math.pow(-2 * introLinear + 2, 3) / 2;
+
+      const grid = layout(s);
+
+      fieldUniforms.uSize.value = [width, height];
+      fieldUniforms.uGrid.value = grid.grid;
+      fieldUniforms.uOrigin.value = grid.origin;
+      fieldUniforms.uSlat.value = [grid.slatW, grid.slatH];
+      fieldUniforms.uTime.value = time;
+      fieldUniforms.uScale.value = s.scale;
+      fieldUniforms.uDirection.value = (s.direction * Math.PI) / 180;
+      fieldUniforms.uChop.value = clamp(s.chop, 0, 1.5);
+      fieldUniforms.uStretch.value = clamp(s.stretch, 0, 0.95);
+      fieldUniforms.uGlint.value = Math.max(0, s.glint);
+      fieldUniforms.uContrast.value = clamp(s.contrast, 0.2, 4);
+      fieldUniforms.uPerspective.value = clamp(s.perspective, 0, 1);
+      fieldUniforms.uFog.value = clamp(s.fog, 0, 1);
+      fieldUniforms.uIntro.value = introEase;
+      fieldUniforms.uFluid.value = 0;
+      fieldUniforms.tVelocity.value = blank;
+      fieldUniforms.tInk.value = blank;
+      fieldUniforms.uFluidTexel.value = fluidTexel.value;
+      fieldUniforms.uInk.value = 0;
+      fieldUniforms.uLean.value = clamp(s.lean, 0, 1);
+      renderer.render({ scene: fieldMesh, target: fieldTarget });
+
+      slatUniforms.uSize.value = [width, height];
+      slatUniforms.uDpr.value = renderer.dpr;
+      slatUniforms.uGrid.value = grid.grid;
+      slatUniforms.uOrigin.value = grid.origin;
+      slatUniforms.uSlat.value = [grid.slatW, grid.slatH];
+      slatUniforms.uRound.value = clamp(s.roundness, 0, 1);
+      slatUniforms.uTilt.value = 0;
+      slatUniforms.uColor.value = s.color.slice(0, 3);
+      slatUniforms.uGlintColor.value = s.glintColor.slice(0, 3);
+      slatUniforms.uBackground.value = s.backgroundColor;
+      renderer.render({ scene: slatMesh });
+    };
+
+    const resize = () => {
+      width = Math.max(1, container.clientWidth || window.innerWidth || 1200);
+      height = Math.max(1, container.clientHeight || window.innerHeight || 800);
+      const dprLimit = isCoarseRef.current ? MOBILE_DPR_CAP : 2;
+      renderer.dpr = Math.min(
+        window.devicePixelRatio || 1,
+        dprLimit,
+        Math.sqrt(PIXEL_BUDGET / (width * height))
+      );
+      renderer.setSize(width, height);
+      buildFluid();
+      if (qualityRef.current === 'minimal') {
+        renderSingleFrame();
+      } else {
+        start();
+      }
     };
 
     const splat = (pair: Pair, point: number[], value: number[], radius: number) => {
@@ -965,13 +1027,13 @@ export const MicroSlats = ({
 
       const moving =
         (!s.paused && !reducedMotion && s.speed !== 0) || introClock < 1;
-      if (visible && !document.hidden && !s.paused && (moving || fluidActive || fluidDirty))
+      if (visible && !document.hidden && !s.paused && qualityRef.current !== 'minimal' && (moving || fluidActive || fluidDirty))
         raf = requestAnimationFrame(frame);
     };
 
     const start = () => {
       const s = settingsRef.current;
-      if (raf || !visible || !alive || document.hidden || (s && s.paused)) return;
+      if (raf || !visible || !alive || document.hidden || (s && s.paused) || qualityRef.current === 'minimal') return;
       last = performance.now();
       lastRenderTime = performance.now();
       raf = requestAnimationFrame(frame);
@@ -979,7 +1041,7 @@ export const MicroSlats = ({
 
     const handleStateUpdate = () => {
       const s = settingsRef.current;
-      if (document.hidden || !visible || (s && s.paused)) {
+      if (document.hidden || !visible || (s && s.paused) || qualityRef.current === 'minimal') {
         if (raf) {
           cancelAnimationFrame(raf);
           raf = 0;
@@ -1023,7 +1085,7 @@ export const MicroSlats = ({
     const onPointerMove = (e: PointerEvent) => {
       const s = settingsRef.current;
       const spot = locate(e);
-      if (!fluid || !s || !s.interactive || reducedMotion || !spot.inside) {
+      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside) {
         pointer.tracked = false;
         return;
       }
@@ -1044,7 +1106,7 @@ export const MicroSlats = ({
     const onPointerDown = (e: PointerEvent) => {
       const s = settingsRef.current;
       const spot = locate(e);
-      if (!fluid || !s || !s.interactive || reducedMotion || !spot.inside) return;
+      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside) return;
       splashTurn += 2.39996;
       queue(spot.u, spot.v, 0, 0, splashTurn);
     };
