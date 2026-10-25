@@ -6,6 +6,8 @@ import { useQuality } from '../hooks/useQuality';
 
 const MOBILE_DPR_CAP = 1;
 const FRAME_INTERVAL_MOBILE = 1000 / 30;
+const BELOW_HERO_FPS_CAP = 30;
+const FRAME_INTERVAL_BELOW_HERO = 1000 / BELOW_HERO_FPS_CAP;
 
 type SwellPreset = 'swell' | 'tide' | 'storm' | 'signal';
 type Rgba = [number, number, number, number];
@@ -939,7 +941,13 @@ export const MicroSlats = ({
       const L = getEffectLevel();
       const elapsed = now - lastRenderTime;
 
-      if (coarse && elapsed < FRAME_INTERVAL_MOBILE) {
+      const minInterval = coarse
+        ? FRAME_INTERVAL_MOBILE
+        : L <= 0.02
+        ? FRAME_INTERVAL_BELOW_HERO
+        : 0;
+
+      if (minInterval > 0 && elapsed < minInterval) {
         raf = requestAnimationFrame(frame);
         return;
       }
@@ -957,11 +965,11 @@ export const MicroSlats = ({
           ? 4 * introLinear * introLinear * introLinear
           : 1 - Math.pow(-2 * introLinear + 2, 3) / 2;
 
-      if (coarse || L < 0.02) {
+      if (coarse || L <= 0.02) {
         splats.length = 0;
       }
 
-      if (!coarse && L >= 0.02 && fluid && splats.length) {
+      if (!coarse && L > 0.02 && fluid && splats.length) {
         const radius = Math.pow(clamp(s.cursorSize, 4, 600) / height, 2) * 0.35;
         const aspect = width / height;
         for (const [u, v, du, dv, turn] of splats) {
@@ -991,7 +999,7 @@ export const MicroSlats = ({
         splats.length = 0;
         fluidDirty = true;
       }
-      const fluidActive = !coarse && fluid !== null && now < fluidUntil;
+      const fluidActive = !coarse && fluid !== null && now < fluidUntil && L > 0.02;
       if (fluid) {
         if (fluidActive) stepFluid(fluid, Math.min(Math.max(dt, 1 / 240), 1 / 30), s);
         else if (fluidDirty) {
@@ -1125,7 +1133,7 @@ export const MicroSlats = ({
       dv: number,
       turn: number | null
     ) => {
-      if (getEffectLevel() < 0.02) {
+      if (getEffectLevel() <= 0.02) {
         splats.length = 0;
         return;
       }
@@ -1140,7 +1148,7 @@ export const MicroSlats = ({
     const onPointerMove = (e: PointerEvent) => {
       const s = settingsRef.current;
       const spot = locate(e);
-      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside || getEffectLevel() < 0.02) {
+      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside || getEffectLevel() <= 0.02) {
         pointer.tracked = false;
         return;
       }
@@ -1161,7 +1169,7 @@ export const MicroSlats = ({
     const onPointerDown = (e: PointerEvent) => {
       const s = settingsRef.current;
       const spot = locate(e);
-      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside || getEffectLevel() < 0.02) return;
+      if (!fluid || !s || !s.interactive || reducedMotion || qualityRef.current === 'minimal' || !spot.inside || getEffectLevel() <= 0.02) return;
       splashTurn += 2.39996;
       queue(spot.u, spot.v, 0, 0, splashTurn);
     };

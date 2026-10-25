@@ -21,7 +21,6 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [heroVisible, setHeroVisible] = useState(true);
   const heroFadeRef = useRef(1);
 
   // Compute hero fade level for cursor effects, throttled with requestAnimationFrame
@@ -55,24 +54,6 @@ export default function App() {
       window.removeEventListener('scroll', onScrollOrResize);
       window.removeEventListener('resize', onScrollOrResize);
     };
-  }, []);
-
-  // Freeze MicroSlats when hero is out of view (all tiers)
-  useEffect(() => {
-    const heroEl = document.getElementById('hero');
-    if (!heroEl) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry) {
-          setHeroVisible(entry.isIntersecting);
-        }
-      },
-      { threshold: 0 }
-    );
-
-    observer.observe(heroEl);
-    return () => observer.disconnect();
   }, []);
 
   // Lock body scroll whenever any modal is active
@@ -130,19 +111,12 @@ export default function App() {
     }
   };
 
-  // Track scroll position for active section and hero visibility
+  // Track scroll position for active section
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const bentoEl = document.getElementById('bento-section');
       const contactEl = document.getElementById('contact-section');
-      const heroEl = document.getElementById('hero');
-
-      // Initiate micro slats freeze after the hero window has scrolled out of view
-      if (heroEl) {
-        const rect = heroEl.getBoundingClientRect();
-        setHeroVisible(rect.bottom > 0);
-      }
 
       const bentoTop = bentoEl ? bentoEl.offsetTop - 180 : 500;
       const contactTop = contactEl ? contactEl.offsetTop - 240 : 1300;
@@ -191,7 +165,7 @@ export default function App() {
           perspective={0.55}
           fog={0.5}
           introDuration={1.5}
-          paused={activeModal !== 'none' || isLoreOpen || !heroVisible}
+          paused={activeModal !== 'none' || isLoreOpen}
           effectLevelRef={heroFadeRef}
         />
       </div>
