@@ -8,7 +8,6 @@ export const HolographicProfileCard: React.FC = () => {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50 });
-  const [isFlipped, setIsFlipped] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -43,29 +42,21 @@ export const HolographicProfileCard: React.FC = () => {
     setGlarePosition({ x: 50, y: 50 });
   };
 
-  const handleFlip = () => {
-    if (!isCoarse) setIsFlipped((prev) => !prev);
-  };
-
   return (
     <div className={isCoarse ? "flex flex-col items-center justify-center my-6 select-none" : "flex flex-col items-center justify-center my-6 select-none perspective-1000"}>
       <div
         ref={cardRef}
-        onClick={isCoarse ? undefined : handleFlip}
         onMouseMove={isCoarse ? undefined : handleMouseMove}
         onMouseEnter={isCoarse ? undefined : handleMouseEnter}
         onMouseLeave={isCoarse ? undefined : handleMouseLeave}
-        className={isCoarse ? "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl group shadow-2xl" : "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl cursor-pointer transition-transform duration-200 ease-out preserve-3d group shadow-2xl"}
+        className={isCoarse ? "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl group shadow-2xl" : "relative w-[300px] sm:w-[360px] h-[440px] sm:h-[480px] rounded-2xl transition-transform duration-200 ease-out group shadow-2xl"}
         style={isCoarse ? undefined : {
-          transform: `rotateX(${rotateX}deg) rotateY(${isFlipped ? rotateY + 180 : rotateY}deg)`,
+          transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
         }}
       >
         {/* ================= FRONT SIDE ================= */}
         <div
           className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#121926] via-[#0d131f] to-[#070a10] overflow-hidden shadow-inner flex flex-col justify-end"
-          style={isCoarse ? undefined : {
-            backfaceVisibility: 'hidden',
-          }}
         >
           {/* Holographic Iridescent Foil Sheen */}
           <div
@@ -98,52 +89,8 @@ export const HolographicProfileCard: React.FC = () => {
 
           {/* Accessible Heading for Screen Readers */}
           <h3 className="sr-only">{PERSONAL_INFO.name}</h3>
-
-          {/* Bottom Card Strip (Minimal, floating seamlessly without any background shelf lines) */}
-          <div className="relative z-20 w-full pb-3.5 px-5 flex items-center justify-end text-[11px] font-mono text-slate-300">
-            <span
-              className="text-slate-200 group-hover:text-red-400 transition-colors flex items-center gap-1 font-semibold"
-              style={{
-                textShadow: '0 2px 8px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.95)',
-              }}
-            >
-              <span>Flip</span> ↺
-            </span>
-          </div>
         </div>
-
-        {/* ================= BACK SIDE (Desktop Only) ================= */}
-        {!isCoarse && (
-          <div
-            className="absolute inset-0 w-full h-full rounded-2xl border border-white/20 bg-gradient-to-br from-[#0c1017] via-[#101726] to-[#070a10] p-6 flex flex-col justify-end overflow-hidden shadow-2xl"
-            style={{
-              transform: 'rotateY(180deg)',
-              backfaceVisibility: 'hidden',
-            }}
-          >
-            {/* Subtle back glare */}
-            <div
-              className="absolute inset-0 pointer-events-none opacity-20"
-              style={{
-                background:
-                  'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(59, 130, 246, 0.2))',
-              }}
-            />
-
-            {/* Back Footer */}
-            <div className="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between font-mono text-[11px] text-slate-400">
-              <span>github.com/{PERSONAL_INFO.githubHandle}</span>
-              <span className="text-slate-300 group-hover:text-red-400 transition-colors flex items-center gap-1 font-semibold">
-                <span>Flip</span> ↺
-              </span>
-            </div>
-          </div>
-        )}
       </div>
-
-      <p className="mt-3 text-xs font-mono text-slate-500">
-        Hover to tilt in 3D · Click anywhere to flip
-      </p>
     </div>
   );
 };

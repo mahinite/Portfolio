@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LORE_CHAPTERS } from '../data/portfolioData';
 import { LoreItem } from '../types/portfolio';
+import { useLowPower } from '../hooks/useLowPower';
 
 interface LoreModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ export const LoreModal: React.FC<LoreModalProps> = ({
   onClose,
   onBackToAbout,
 }) => {
+  const isLowPower = useLowPower();
   const [selectedChapter, setSelectedChapter] = useState<LoreItem | null>(null);
 
   // Keyboard accessibility
@@ -37,9 +39,19 @@ export const LoreModal: React.FC<LoreModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-y-auto bg-[#080c14]/90 backdrop-blur-2xl animate-modal-backdrop">
+    <div
+      className={`fixed inset-0 z-[60] overflow-y-auto ${
+        isLowPower
+          ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
+          : 'bg-[#080c14]/90 backdrop-blur-2xl animate-modal-backdrop'
+      }`}
+    >
       {/* Top Header Bar */}
-      <div className="sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8 animate-modal-slide-up">
+      <div
+        className={`sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8 ${
+          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+        }`}
+      >
         <button
           onClick={onBackToAbout}
           className="font-mono text-xs text-slate-300 hover:text-white underline underline-offset-4 decoration-slate-600 hover:decoration-white transition-all flex items-center gap-1.5 cursor-pointer"
@@ -49,14 +61,19 @@ export const LoreModal: React.FC<LoreModalProps> = ({
 
         <button
           onClick={onClose}
-          className="w-10 h-10 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center transition-all cursor-pointer group"
+          className="w-10 h-10 rounded-full border border-[#d94551]/30 bg-[#d94551]/10 hover:bg-[#d94551]/20 hover:border-[#d94551]/60 text-[#d94551] flex items-center justify-center transition-all cursor-pointer group"
+          style={{ color: '#d94551' }}
           aria-label="Close modal"
         >
           <span className="text-lg group-hover:scale-110 transition-transform">✕</span>
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 pb-24 pt-4 animate-modal-slide-up">
+      <div
+        className={`max-w-3xl mx-auto px-6 pb-24 pt-4 ${
+          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+        }`}
+      >
         {/* Lore Heading */}
         <div className="mb-12">
           <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight">
@@ -102,11 +119,19 @@ export const LoreModal: React.FC<LoreModalProps> = ({
 
       {/* Chapter Detail Slide-over / Modal */}
       {selectedChapter && (
-        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+        <div
+          className={`fixed inset-0 z-60 flex items-center justify-center p-4 sm:p-6 ${
+            isLowPower
+              ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
+              : 'bg-black/80 backdrop-blur-md animate-fadeIn'
+          }`}
+        >
           <div className="relative w-full max-w-2xl bg-[#0e1422] border border-white/15 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setSelectedChapter(null)}
-              className="absolute top-6 right-6 w-8 h-8 rounded-full border border-white/10 hover:border-white/30 text-white flex items-center justify-center text-sm transition-all"
+              className="absolute top-6 right-6 w-8 h-8 rounded-full border border-[#d94551]/30 bg-[#d94551]/10 hover:bg-[#d94551]/20 hover:border-[#d94551]/60 text-[#d94551] flex items-center justify-center text-sm transition-all cursor-pointer"
+              style={{ color: '#d94551' }}
+              aria-label="Close chapter"
             >
               ✕
             </button>

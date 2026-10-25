@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { HolographicProfileCard } from './HolographicProfileCard';
 import { PERSONAL_INFO } from '../data/portfolioData';
+import { useLowPower } from '../hooks/useLowPower';
 
 interface AboutModalProps {
   isOpen: boolean;
@@ -15,6 +16,8 @@ export const AboutModal: React.FC<AboutModalProps> = ({
   onClose,
   onOpenLore,
 }) => {
+  const isLowPower = useLowPower();
+
   // Listen for Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -31,9 +34,19 @@ export const AboutModal: React.FC<AboutModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop">
+    <div
+      className={`fixed inset-0 z-50 overflow-y-auto ${
+        isLowPower
+          ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
+          : 'bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop'
+      }`}
+    >
       {/* Top Bar with Close Button */}
-      <div className="sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8 animate-modal-slide-up">
+      <div
+        className={`sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8 ${
+          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+        }`}
+      >
         <button
           onClick={onClose}
           className="w-10 h-10 rounded-full border border-[#d94551]/30 bg-[#d94551]/10 hover:bg-[#d94551]/20 hover:border-[#d94551]/60 text-[#d94551] flex items-center justify-center transition-all cursor-pointer group"
@@ -44,7 +57,11 @@ export const AboutModal: React.FC<AboutModalProps> = ({
         </button>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 pb-20 pt-2 flex flex-col items-center text-center animate-modal-slide-up">
+      <div
+        className={`max-w-3xl mx-auto px-6 pb-20 pt-2 flex flex-col items-center text-center ${
+          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+        }`}
+      >
 
         {/* Full Name */}
         <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">

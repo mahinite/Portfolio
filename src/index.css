@@ -87,6 +87,34 @@
   will-change: transform, opacity;
 }
 
+@keyframes modalSlideUpLowPower {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalBackdropFadeInLowPower {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-modal-backdrop-lowpower {
+  animation: modalBackdropFadeInLowPower 0.15s ease-out forwards;
+}
+
+.animate-modal-slide-up-lowpower {
+  animation: modalSlideUpLowPower 0.18s ease-out forwards;
+}
+
 /* Custom subtle scrollbars */
 ::-webkit-scrollbar {
   width: 6px;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PROJECTS } from '../data/portfolioData';
 import { ProjectItem } from '../types/portfolio';
+import { useLowPower } from '../hooks/useLowPower';
 
 interface ProjectDetailModalProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   initialProject,
   onClose,
 }) => {
+  const isLowPower = useLowPower();
   const [activeProject, setActiveProject] = useState<ProjectItem>(
     initialProject || PROJECTS[0]
   );
@@ -77,9 +79,19 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop">
+    <div
+      className={`fixed inset-0 z-50 overflow-y-auto ${
+        isLowPower
+          ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
+          : 'bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop'
+      }`}
+    >
       {/* Top Bar */}
-      <div className="sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8 animate-modal-slide-up">
+      <div
+        className={`sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8 ${
+          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+        }`}
+      >
         <button
           onClick={onClose}
           className="w-10 h-10 rounded-full border border-[#d94551]/30 bg-[#d94551]/10 hover:bg-[#d94551]/20 hover:border-[#d94551]/60 text-[#d94551] flex items-center justify-center transition-all cursor-pointer group"
@@ -90,7 +102,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         </button>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 pb-20 pt-2 space-y-8 animate-modal-slide-up">
+      <div
+        className={`max-w-4xl mx-auto px-6 pb-20 pt-2 space-y-8 ${
+          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+        }`}
+      >
         {/* Project Selector Tabs */}
         <div className="flex items-center gap-2 p-1.5 bg-[#0d131f] border border-white/[0.08] rounded-xl overflow-x-auto">
           {PROJECTS.map((proj) => (

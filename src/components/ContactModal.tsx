@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { PERSONAL_INFO } from '../data/portfolioData';
+import { useLowPower } from '../hooks/useLowPower';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
   onClose,
   onShowToast,
 }) => {
+  const isLowPower = useLowPower();
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -75,9 +77,19 @@ export const ContactModal: React.FC<ContactModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop">
+    <div
+      className={`fixed inset-0 z-50 overflow-y-auto ${
+        isLowPower
+          ? 'bg-[#080c14] animate-modal-backdrop-lowpower'
+          : 'bg-[#080c14]/95 backdrop-blur-2xl animate-modal-backdrop'
+      }`}
+    >
       {/* Top Bar */}
-      <div className="sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8 animate-modal-slide-up">
+      <div
+        className={`sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8 ${
+          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+        }`}
+      >
         <span className="font-mono text-xs text-red-400 tracking-widest uppercase font-bold">
           TRANSMIT MESSAGE / SAY HI
         </span>
@@ -92,7 +104,11 @@ export const ContactModal: React.FC<ContactModalProps> = ({
         </button>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 pb-20 pt-2 space-y-8 animate-modal-slide-up">
+      <div
+        className={`max-w-2xl mx-auto px-6 pb-20 pt-2 space-y-8 ${
+          isLowPower ? 'animate-modal-slide-up-lowpower' : 'animate-modal-slide-up'
+        }`}
+      >
         {/* Header */}
         <div className="space-y-3">
           <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
