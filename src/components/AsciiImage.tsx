@@ -218,7 +218,10 @@ export default function AsciiImage({
   return (
     <div
       className={cn("relative overflow-hidden", className)}
-      style={{ width, height }}
+      style={{
+        width: typeof width === "string" ? width : undefined,
+        height: typeof height === "string" ? height : undefined,
+      }}
     >
       <img
         src={defaultImageSrc}

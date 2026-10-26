@@ -50,7 +50,7 @@ export const LoreModal: React.FC<LoreModalProps> = ({
     >
       {/* Top Header Bar */}
       <div
-        className={`sticky top-0 z-50 flex items-center justify-between max-w-5xl mx-auto p-6 sm:p-8 ${
+        className={`sticky top-0 z-50 flex items-center justify-end max-w-5xl mx-auto p-6 sm:p-8 ${
           quality === 'minimal'
             ? 'animate-modal-slide-up-minimal'
             : quality === 'lite'
@@ -58,13 +58,6 @@ export const LoreModal: React.FC<LoreModalProps> = ({
             : 'animate-modal-slide-up'
         }`}
       >
-        <button
-          onClick={onBackToAbout}
-          className="font-mono text-xs text-slate-300 hover:text-white underline underline-offset-4 decoration-slate-600 hover:decoration-white transition-all flex items-center gap-1.5 cursor-pointer"
-        >
-          <span>← Back to About</span>
-        </button>
-
         <button
           onClick={onClose}
           className="w-10 h-10 rounded-full border border-[#d94551]/30 bg-[#d94551]/10 hover:bg-[#d94551]/20 hover:border-[#d94551]/60 text-[#d94551] flex items-center justify-center transition-all cursor-pointer group"
