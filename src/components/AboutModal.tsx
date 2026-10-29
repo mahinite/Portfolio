@@ -109,24 +109,6 @@ export const AboutModal: React.FC<AboutModalProps> = ({
         <div className="w-full flex justify-center my-6">
           <HolographicProfileCard />
         </div>
-
-        {/* Bottom LORE Banner Card */}
-        <div
-          onClick={onOpenLore}
-          className="w-full max-w-xl rounded-2xl border border-white/[0.08] bg-[#0d131f]/90 p-6 sm:p-7 text-left hover:border-white/20 transition-all duration-300 shadow-xl cursor-pointer group mt-4"
-        >
-          <div className="flex items-center justify-between">
-            <h2
-              className="text-xl sm:text-2xl font-extrabold tracking-wider"
-              style={{ color: '#d94551' }}
-            >
-              LORE
-            </h2>
-            <span className="text-amber-400 group-hover:translate-x-1.5 group-hover:text-amber-300 transition-all text-lg font-mono">
-              →
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
